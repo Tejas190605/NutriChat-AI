@@ -19,6 +19,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 *   CI scripts including [.pre-commit-config.yaml](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/.pre-commit-config.yaml) and GitHub Actions workflow file [.github/workflows/ci.yml](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/.github/workflows/ci.yml).
 *   Multi-stage docker build configuration [Dockerfile](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/Dockerfile) and [docker-compose.yml](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/docker-compose.yml).
 
+### Fixed
+*   Migrated synchronous Redis client connections to `redis.asyncio` async client in [redis_client.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/services/redis_client.py) to prevent event-loop blockages.
+*   Refactored [health.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/api/health.py) health endpoint so Celery worker inspection is run in FastAPI's threadpool (`run_in_threadpool`).
+*   Hardened [Dockerfile](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/Dockerfile) to create and run as a non-root system user (`appuser`), dropping container root privileges.
+*   Replaced wildcard CORS configuration with dynamic settings list `CORS_ORIGINS` parsed natively from JSON arrays in [settings.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/config/settings.py).
+*   Cleaned default secrets from [docker-compose.yml](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/docker-compose.yml), migrating database password mappings to environment variable interpolation.
+
 ## [0.1.1] - 2026-07-22
 ### Added
 *   Onboarding `/reset` command specifications inside [functional_requirements.md](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/specs/functional_requirements.md) and state machine configurations inside [ARCHITECTURE.md](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/ARCHITECTURE.md).

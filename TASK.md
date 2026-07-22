@@ -54,6 +54,7 @@ This checklist tracks the execution milestones for NutriChat AI development.
     *   [x] Configure Alembic migrations setup
     *   [x] Write API health routes
     *   [x] Add database connectivity checks in health endpoint
+    *   [x] Apply Backend Foundation Audit recommendations (Async Redis, threadpool isolated Celery checks, non-root Docker hardening, configurable CORS, env-driven Compose secrets)
 
 ### Milestone 2.2: User Management & Authentication
 *   **Phase**: Backend Phase 1

@@ -1,7 +1,8 @@
 import time
+from collections.abc import Awaitable, Callable
+from typing import Any
 
 import structlog
-from typing import Any, Callable, Awaitable
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -25,7 +26,7 @@ app = FastAPI(
 # Configure CORS middleware rules
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Restrict in production layouts
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

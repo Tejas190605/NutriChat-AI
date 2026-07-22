@@ -1,6 +1,8 @@
-import structlog
 from typing import Any
+
+import structlog
 from fastapi import APIRouter, Depends, status
+from fastapi.concurrency import run_in_threadpool
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import text
 
@@ -12,13 +14,29 @@ logger = structlog.get_logger()
 router = APIRouter()
 
 
+def check_celery_workers() -> bool:
+    """Helper function performing synchronous socket check to active workers.
+
+    Runs inside a threadpool worker thread to prevent event loop starvation.
+    """
+    try:
+        inspect_res = celery_app.control.inspect(timeout=1.0)
+        workers_ping = inspect_res.ping() if inspect_res else None
+        return bool(workers_ping)
+    except Exception as e:
+        logger.warning("Celery workers inspect check failed", error=str(e))
+        return False
+
+
 @router.get(
     "/health",
     status_code=status.HTTP_200_OK,
     summary="Assess system operational health status",
 )
-async def health_check(db: AsyncSession = Depends(get_async_session)) -> dict[str, Any]:
-    """Performs real-time diagnostic checks on db, cache, and Celery workers."""
+async def health_check(
+    db: AsyncSession = Depends(get_async_session),
+) -> dict[str, Any]:
+    """Performs non-blocking operational health diagnostics on downstream systems."""
 
     # 1. Database Health check
     db_healthy = False
@@ -28,19 +46,11 @@ async def health_check(db: AsyncSession = Depends(get_async_session)) -> dict[st
     except Exception as e:
         logger.error("PostgreSQL connection check failed", error=str(e))
 
-    # 2. Redis Caching Health check
-    redis_healthy = check_redis_health()
+    # 2. Redis Caching Health check (async execution)
+    redis_healthy = await check_redis_health()
 
-    # 3. Celery Worker Queue check
-    celery_healthy = False
-    try:
-        inspect_res = celery_app.control.inspect(timeout=1.0)
-        # Verify if any active worker responds to ping
-        workers_ping = inspect_res.ping() if inspect_res else None
-        if workers_ping:
-            celery_healthy = True
-    except Exception as e:
-        logger.warning("Celery workers connection check unreachable", error=str(e))
+    # 3. Celery Worker Queue check (threadpool isolation)
+    celery_healthy = await run_in_threadpool(check_celery_workers)
 
     overall_healthy = db_healthy and redis_healthy
 

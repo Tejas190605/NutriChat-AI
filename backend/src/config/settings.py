@@ -13,6 +13,9 @@ class Settings(BaseSettings):
     ENV: str = Field(default="development")
     DEBUG: bool = Field(default=True)
     PORT: int = Field(default=8000)
+    CORS_ORIGINS: list[str] = Field(
+        default=["http://localhost:3000", "http://127.0.0.1:3000"]
+    )
 
     # Database
     POSTGRES_USER: str = Field(default="postgres")
@@ -47,7 +50,11 @@ class Settings(BaseSettings):
     @model_validator(mode="after")
     def assemble_db_url(self) -> "Settings":
         # Assemble fallback database URL if default is not custom
-        if not self.DATABASE_URL or self.DATABASE_URL == "postgresql+asyncpg://postgres:postgres@localhost:5432/nutrichat":
+        if (
+            not self.DATABASE_URL
+            or self.DATABASE_URL
+            == "postgresql+asyncpg://postgres:postgres@localhost:5432/nutrichat"
+        ):
             self.DATABASE_URL = f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
         return self
 
