@@ -21,6 +21,9 @@ TestingSessionLocal = async_sessionmaker(
 )
 
 
+DATABASE_ONLINE = True
+
+
 @pytest.fixture(scope="session")
 def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
     """Create an instance of the default event loop for the test session."""
@@ -32,14 +35,17 @@ def event_loop() -> Generator[asyncio.AbstractEventLoop, None, None]:
 @pytest.fixture(autouse=True)
 async def init_test_db() -> AsyncGenerator[None, None]:
     """Initializes schema tables in test database database."""
+    global DATABASE_ONLINE
     has_db = False
     try:
         async with test_engine.begin() as conn:
             # Create all tables matching Base declarations
             await conn.run_sync(Base.metadata.create_all)
         has_db = True
+        DATABASE_ONLINE = True
     except Exception:
         print("\n[Warning] Test Database is offline. Skipping schema initializations.")
+        DATABASE_ONLINE = False
         
     yield
     
@@ -55,6 +61,10 @@ async def init_test_db() -> AsyncGenerator[None, None]:
 @pytest.fixture
 async def db_session() -> AsyncGenerator[AsyncSession | None, None]:
     """Yields an isolated async session for database queries assertions."""
+    global DATABASE_ONLINE
+    if not DATABASE_ONLINE:
+        yield None
+        return
     try:
         async with TestingSessionLocal() as session:
             yield session

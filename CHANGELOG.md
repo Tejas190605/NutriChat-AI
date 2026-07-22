@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.3] - 2026-07-22
+### Added
+*   11 database models mapping the user domain (User, UserProfile, UserGoal, UserPreference, Allergy, DietaryPreference, ActivityLevel, WeightHistory, UserSession, RefreshToken, AuditLog) in [models/](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/models/).
+*   Pydantic schemas validating user registration, logins, JWT rotation, profiles, and weight logs in [schemas/](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/schemas/).
+*   Generic base repository class and customized async User and RefreshToken queries in [repositories/](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/repositories/).
+*   Argon2 credential checks, JWT tokens rotation rules, and active sessions manager in [auth_service.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/services/auth_service.py).
+*   Mifflin-St Jeor TDEE calculators, macro splits splits, profiles completion, and weight history logs in [user_service.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/services/user_service.py).
+*   FastAPI endpoints under `/api/v1/auth` and `/api/v1/users` registered in main API routes.
+*   Initial Alembic schema migrations script [001_initial_user_domain.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/migrations/versions/001_initial_user_domain.py).
+*   Comprehensive unit, repository, and controller api testing coverage validating user logic with dynamic offline DB skipped fallbacks in [tests/](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/tests/).
+
+### Fixed
+*   Refactored deprecated Pydantic v1 `class Config` configurations in schema models to modern `ConfigDict` schemas.
+*   Corrected generic base repository models attribute checks using standard properties with selective `# type: ignore[attr-defined]` tags.
+
 ## [0.1.2] - 2026-07-22
 ### Added
 *   Production-grade FastAPI project directory structure layout inside `/backend`.

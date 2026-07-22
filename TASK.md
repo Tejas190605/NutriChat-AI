@@ -63,14 +63,14 @@ This checklist tracks the execution milestones for NutriChat AI development.
 *   **Priority**: High
 *   **Dependencies**: `TASK-002`
 *   **Estimated Effort**: 8 hours
-*   **Status**: Todo
+*   **Status**: Completed
 *   **Owner Agent**: Authentication Engineer
 *   **Completion Checklist**:
-    *   [ ] Create User entity database schema
-    *   [ ] Write password hashing utility functions
-    *   [ ] Implement `/api/v1/auth/register` route
-    *   [ ] Implement `/api/v1/auth/login` route returning JWT
-    *   [ ] Write route auth dependency validation checks
+    *   [x] Create User entity database schema
+    *   [x] Write password hashing utility functions
+    *   [x] Implement `/api/v1/auth/register` route
+    *   [x] Implement `/api/v1/auth/login` route returning JWT
+    *   [x] Write route auth dependency validation checks
 
 ---
 
