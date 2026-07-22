@@ -1,0 +1,104 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: nutrichat-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres_secure_password
+      POSTGRES_DB: nutrichat
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: nutrichat-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: nutrichat-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_NAME=NutriChat-AI
+      - ENV=development
+      - DEBUG=true
+      - PORT=8000
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres_secure_password
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=nutrichat
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres_secure_password@db:5432/nutrichat
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+      - JWT_SECRET=dev_jwt_secret_token
+      - JWT_ALGORITHM=HS256
+      - JWT_EXPIRATION_HOURS=2
+      - FACEBOOK_APP_SECRET=dev_facebook_app_secret
+      - FACEBOOK_VERIFY_TOKEN=dev_facebook_verify_token
+      - GEMINI_API_KEY=dev_gemini_key
+      - EDAMAM_APP_ID=dev_edamam_id
+      - EDAMAM_APP_KEY=dev_edamam_key
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: nutrichat-worker
+    command: celery -A src.services.celery_app.celery_app worker --loglevel=info
+    environment:
+      - APP_NAME=NutriChat-AI
+      - ENV=development
+      - DEBUG=true
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres_secure_password
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=nutrichat
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres_secure_password@db:5432/nutrichat
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=redis://redis:6379/1
+      - CELERY_RESULT_BACKEND=redis://redis:6379/2
+      - JWT_SECRET=dev_jwt_secret_token
+      - JWT_ALGORITHM=HS256
+      - JWT_EXPIRATION_HOURS=2
+      - FACEBOOK_APP_SECRET=dev_facebook_app_secret
+      - FACEBOOK_VERIFY_TOKEN=dev_facebook_verify_token
+      - GEMINI_API_KEY=dev_gemini_key
+      - EDAMAM_APP_ID=dev_edamam_id
+      - EDAMAM_APP_KEY=dev_edamam_key
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  redis_data:

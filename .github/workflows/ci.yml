@@ -1,0 +1,49 @@
+name: Backend CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        working-directory: ./backend
+        run: |
+          poetry install
+
+      - name: Run Black formatting check
+        working-directory: ./backend
+        run: |
+          poetry run black --check src/
+
+      - name: Run Ruff Lint check
+        working-directory: ./backend
+        run: |
+          poetry run ruff check src/
+
+      - name: Run MyPy Type check
+        working-directory: ./backend
+        run: |
+          poetry run mypy src/
+
+      - name: Run Pytest test suite
+        working-directory: ./backend
+        run: |
+          poetry run pytest
