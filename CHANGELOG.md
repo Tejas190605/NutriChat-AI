@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.4] - 2026-07-23
+### Added
+*   13 database models mapping the nutrition domain (Food, FoodCategory, Ingredient, Meal, MealItem, NutritionProfile, NutritionFact, BarcodeProduct, NutritionLabel, RestaurantMenu, GroceryProduct, FavoriteFood, RecentFood) in [models/](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/models/).
+*   Pydantic validation schemas for logging meals, retrieving daily summaries vs targets progress, and weekly averages inside [schemas/](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/schemas/).
+*   Asynchronous repositories mapping database relations for Food, Category, Favorites, Recents, Meals, and Barcodes in [repositories/](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/repositories/).
+*   `MealService` managing logs insertions, portions updates, soft deletes, daily progress vs targets calculation, and weekly averages calculations in [meal_service.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/services/meal_service.py).
+*   `NutritionService` wrapping food text lookups, barcode lookups, and favorites registry lists in [nutrition_service.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/services/nutrition_service.py).
+*   FastAPI endpoint routers under `/api/v1/meals` and `/api/v1/nutrition` registered inside the main application entry point.
+*   Alembic migration revision script [002_nutrition_domain.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/migrations/versions/002_nutrition_domain.py) creating schema tables, unique constraints, and search optimizations indexes.
+*   Integration and unit test suites covering the services logic and API parameters validation in [tests/](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/tests/).
+
+### Fixed
+*   Resolved Ruff `ARG001` unused parameter errors by renaming authentication dependents to `_current_user` in lookup routes.
+*   Resolved MyPy generic type warnings by specifying type arguments for dictionary return types in meal service.
+
 ## [0.1.3] - 2026-07-22
 ### Added
 *   11 database models mapping the user domain (User, UserProfile, UserGoal, UserPreference, Allergy, DietaryPreference, ActivityLevel, WeightHistory, UserSession, RefreshToken, AuditLog) in [models/](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/models/).

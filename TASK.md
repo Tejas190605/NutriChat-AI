@@ -72,6 +72,24 @@ This checklist tracks the execution milestones for NutriChat AI development.
     *   [x] Implement `/api/v1/auth/login` route returning JWT
     *   [x] Write route auth dependency validation checks
 
+### Milestone 2.3: Nutrition Domain & Meal Logging
+*   **Phase**: Backend Phase 1
+*   **Task ID**: `TASK-009`
+*   **Description**: Implement database models, repositories, and REST API controllers for meal logs, food lookups, favorites, recents, and daily summaries.
+*   **Priority**: High
+*   **Dependencies**: `TASK-003`
+*   **Estimated Effort**: 10 hours
+*   **Status**: Completed
+*   **Owner Agent**: Backend Architect
+*   **Completion Checklist**:
+    *   [x] Create 13 nutrition domain database models
+    *   [x] Implement Pydantic validation schemas for meal logs and nutrition lookups
+    *   [x] Create repositories mapping custom relationships
+    *   [x] Write MealService and NutritionService business logic
+    *   [x] Expose REST endpoints under `/api/v1/meals` and `/api/v1/nutrition`
+    *   [x] Generate Alembic migration file `002_nutrition_domain`
+    *   [x] Code comprehensive Pytest test suite verifying endpoints and macro aggregations
+
 ---
 
 ## Epic 3: AI Pipeline & Integrations

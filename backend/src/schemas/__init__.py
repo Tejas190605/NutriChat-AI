@@ -5,6 +5,23 @@ from src.schemas.auth import (
     UserRegisterRequest,
 )
 from src.schemas.goal import UserGoalCreateRequest, UserGoalResponse
+from src.schemas.meal import (
+    DailySummaryResponse,
+    MealCreateRequest,
+    MealItemCreate,
+    MealItemResponse,
+    MealResponse,
+    MealUpdateRequest,
+    WeeklySummaryResponse,
+)
+from src.schemas.nutrition import (
+    BarcodeProductResponse,
+    FavoriteFoodResponse,
+    FoodCategoryResponse,
+    FoodResponse,
+    NutritionFactResponse,
+    RecentFoodResponse,
+)
 from src.schemas.profile import UserProfileResponse, UserProfileUpdateRequest
 from src.schemas.user import UserDetailResponse, UserResponse
 from src.schemas.weight import WeightLogCreateRequest, WeightLogResponse
@@ -22,4 +39,17 @@ __all__ = [
     "UserGoalResponse",
     "WeightLogCreateRequest",
     "WeightLogResponse",
+    "NutritionFactResponse",
+    "FoodCategoryResponse",
+    "FoodResponse",
+    "BarcodeProductResponse",
+    "FavoriteFoodResponse",
+    "RecentFoodResponse",
+    "MealItemCreate",
+    "MealItemResponse",
+    "MealCreateRequest",
+    "MealUpdateRequest",
+    "MealResponse",
+    "DailySummaryResponse",
+    "WeeklySummaryResponse",
 ]
