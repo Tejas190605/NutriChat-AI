@@ -22,6 +22,12 @@ This specification defines the functional features, requirements, user paths, an
     *   *Activity multiplier applied based on selection*.
     *   *Calorie Target adjusted by goal (e.g., -500 kcal for Weight Loss, +300 kcal for Muscle Gain).*
 
+### Onboarding On-Demand Reset Flow
+*   **Reset Directive**: At any point during the onboarding questionnaire, or at any time in the chat history, if the user sends `/reset`, the chatbot must:
+    1.  Clear the active session onboarding state inside Redis.
+    2.  Delete partially collected data caches.
+    3.  Respond: *"Your onboarding details have been cleared. Let's start over! What is your name?"* and enter onboarding state again.
+
 ---
 
 ## 2. Multimodal Logging Intake
@@ -53,7 +59,19 @@ This specification defines the functional features, requirements, user paths, an
 
 ---
 
-## 4. Conversational AI Coaching & Memory
+## 4. Exercise & Activity Tracking
+
+*   **Intake Commands**: Users can log exercises by texting details (e.g. *"I ran for 30 minutes"* or *"walked 10000 steps"*) or sending voice logs.
+*   **MET-Based Calorie Deficit Calculations**: The system maps exercise categories to Metabolic Equivalent of Task (MET) codes:
+    *   *Running*: 9.8 METs
+    *   *Walking*: 3.8 METs
+    *   *Cycling*: 7.5 METs
+    *   *Calorie Deficit Formula*: $\text{Duration (mins)} \times \left(\text{MET} \times 3.5 \times \frac{\text{Weight (kg)}}{200}\right)$
+*   **Net Calorie Adjustments**: Logged activities append to activity history tables and adjust the user's daily budget balance in real-time.
+
+---
+
+## 5. Conversational AI Coaching & Memory
 
 ### Memory Rules
 *   Maintain conversational session context inside Redis (24-hour expiration).
@@ -65,8 +83,16 @@ This specification defines the functional features, requirements, user paths, an
 
 ---
 
-## 5. Daily, Weekly, & Monthly Reports
+## 6. Daily, Weekly, & Monthly Reports
 *   Provide a `/summary` command in WhatsApp returning:
     *   Remaining calorie allowance for the day.
     *   Target vs. logged macro-nutrients balance.
 *   Dashboard Analytics exports weekly and monthly PDF report cards mapping target weight progress.
+
+---
+
+## 7. Webhook Payload Verification
+
+*   **Signature Security Requirement**: To verify that inbound webhook POST payloads originate from Meta, the FastAPI backend must validate the `X-Hub-Signature-256` request header:
+    *   *Algorithm*: HMAC-SHA256 signature generated over the raw request body bytes using the app's Facebook App Secret as the key.
+    *   *Verification Flow*: Compare the generated hash with the header signature using constant-time comparison methods (`hmac.compare_digest`). Reject unauthorized payloads with HTTP 401.

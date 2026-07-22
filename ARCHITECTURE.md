@@ -18,7 +18,8 @@ graph TD
     
     subgraph FastAPI Backend App
         API_Route[Webhook Endpoint] --> Auth[Auth check & Request Sanitizer]
-        Auth --> Caching{Redis Deduplication}
+        Auth --> SignatureVerify[HMAC-SHA256 Signature Verify]
+        SignatureVerify --> Caching{Redis Deduplication}
         Caching -->|New Request| AIPipeline[AI Pipeline Coordinator]
         Caching -->|Duplicate| Ignore[Ignore Payload]
         
@@ -51,26 +52,31 @@ sequenceDiagram
     participant Nutrition as Edamam API
 
     User->>Meta: Sends Food Photo (Pizza)
-    Meta->>Webhook: Webhook Payload (HTTP POST)
-    Webhook-->>Meta: 200 OK (Acknowledge)
-    Webhook->>DB: Fetch User Profile (Height, Target Cal)
-    DB-->>Webhook: Return Profile (Target: 2000 kcal)
-    Webhook->>AI: Send Image to Vision AI
-    AI->>AI: Extract food name ("Pizza") & Portion ("2 slices")
-    Webhook->>Nutrition: Request Macros for "2 slices pizza"
-    Nutrition-->>Webhook: Return Calories (580 kcal), Protein (24g)
-    Webhook->>DB: Log Meal entry
-    Webhook->>AI: Generate coach reply (incorporate targets deficit)
-    AI-->>Webhook: Return conversational text response
-    Webhook->>Meta: Send message template
-    Meta->>User: Renders coach WhatsApp message text
+    Meta->>Webhook: Webhook Payload (HTTP POST with X-Hub-Signature-256)
+    Webhook->>Webhook: Validate HMAC-SHA256 signature using APP_SECRET
+    alt Signature Mismatch
+        Webhook-->>Meta: 401 Unauthorized
+    else Signature Valid
+        Webhook-->>Meta: 200 OK (Acknowledge)
+        Webhook->>DB: Fetch User Profile (Height, Target Cal)
+        DB-->>Webhook: Return Profile (Target: 2000 kcal)
+        Webhook->>AI: Send Image to Vision AI
+        AI->>AI: Extract food name ("Pizza") & Portion ("2 slices")
+        Webhook->>Nutrition: Request Macros for "2 slices pizza"
+        Nutrition-->>Webhook: Return Calories (580 kcal), Protein (24g)
+        Webhook->>DB: Log Meal entry
+        Webhook->>AI: Generate coach reply (incorporate targets deficit)
+        AI-->>Webhook: Return conversational text response
+        Webhook->>Meta: Send message template
+        Meta->>User: Renders coach WhatsApp message text
+    end
 ```
 
 ---
 
-## 3. Conversational State Machine
+## 3. Conversational State Machine (Onboarding & Reset Flow)
 
-When an incoming message event is delivered, the backend checks the user's registration status. Below is the state machine representation of the onboarding flow:
+When an incoming message event is delivered, the backend checks the user's registration status. Below is the state machine representation of the onboarding flow, including the on-demand `/reset` trigger:
 
 ```mermaid
 stateDiagram-v2
@@ -86,6 +92,14 @@ stateDiagram-v2
         AskGoal --> AskActivity : Goal valid
         AskActivity --> SetTargets : Activity valid
         SetTargets --> ProfileComplete
+        
+        AskName --> OnboardingReset : User sends "/reset"
+        AskHeight --> OnboardingReset : User sends "/reset"
+        AskWeight --> OnboardingReset : User sends "/reset"
+        AskGoal --> OnboardingReset : User sends "/reset"
+        AskActivity --> OnboardingReset : User sends "/reset"
+        
+        OnboardingReset --> AskName : Session Cleared
     }
     
     ProfileComplete --> ActiveTracking : Onboarding completed
@@ -96,6 +110,7 @@ stateDiagram-v2
         ParseInput --> VoicePipeline : Input is Audio
         ParseInput --> VisionPipeline : Input is Image/Photo
         ParseInput --> BarcodePipeline : Input is Barcode
+        ParseInput --> ResetTracking : User sends "/reset"
         
         TextPipeline --> SaveLog
         VoicePipeline --> SaveLog
@@ -104,6 +119,8 @@ stateDiagram-v2
         
         SaveLog --> SuggestAlternatives
         SuggestAlternatives --> [*]
+        
+        ResetTracking --> Onboarding_Start : Session Cleared
     }
 ```
 
@@ -111,11 +128,14 @@ stateDiagram-v2
 
 ## 4. Database ERD (Entity Relationship Diagram)
 
+Includes the added `user_activities` table mapping exercise logs and MET-based calculations.
+
 ```mermaid
 erDiagram
     USERS ||--o{ MEALS : "logs"
     USERS ||--o{ CHAT_HISTORIES : "stores"
     USERS ||--o{ NOTIFICATIONS : "manages"
+    USERS ||--o{ USER_ACTIVITIES : "performs"
 
     USERS {
         UUID id PK
@@ -159,6 +179,16 @@ erDiagram
         VARCHAR schedule_cron
         BOOLEAN active
         TIMESTAMP last_sent
+    }
+
+    USER_ACTIVITIES {
+        UUID id PK
+        UUID whatsapp_user_id FK
+        VARCHAR activity_name
+        DECIMAL duration_minutes
+        DECIMAL MET_value
+        INTEGER calories_burned
+        TIMESTAMP time
     }
 ```
 

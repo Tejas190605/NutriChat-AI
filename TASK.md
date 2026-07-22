@@ -4,7 +4,7 @@ This checklist tracks the execution milestones for NutriChat AI development.
 
 ---
 
-## Epic 1: Workspace Initialization (Current)
+## Epic 1: Workspace Initialization (Complete)
 ### Milestone 1.1: Environment Bootstrap
 *   **Phase**: Bootstrap
 *   **Task ID**: `TASK-001`
@@ -12,29 +12,29 @@ This checklist tracks the execution milestones for NutriChat AI development.
 *   **Priority**: High
 *   **Dependencies**: None
 *   **Estimated Effort**: 4 hours
-*   **Status**: In Progress
+*   **Status**: Completed
 *   **Owner Agent**: Technical Writer
 *   **Completion Checklist**:
     *   [x] Create AGENTS.md
     *   [x] Create SKILLS.md
     *   [x] Create RULES.md
     *   [x] Create WORKFLOWS.md
-    *   [ ] Create TASK.md
-    *   [ ] Create PROGRESS.md
-    *   [ ] Create DECISIONS.md
-    *   [ ] Create CHANGELOG.md
-    *   [ ] Rewrite README.md
-    *   [ ] Create CONTRIBUTING.md
-    *   [ ] Create CODE_OF_CONDUCT.md
-    *   [ ] Create SECURITY.md
-    *   [ ] Create ARCHITECTURE.md
-    *   [ ] Create API_REFERENCE.md
-    *   [ ] Create TESTING.md
-    *   [ ] Create DEPLOYMENT.md
-    *   [ ] Create ROADMAP.md
-    *   [ ] Create RISK_REGISTER.md
-    *   [ ] Create KNOWN_ISSUES.md
-    *   [ ] Create STYLE_GUIDE.md
+    *   [x] Create TASK.md
+    *   [x] Create PROGRESS.md
+    *   [x] Create DECISIONS.md
+    *   [x] Create CHANGELOG.md
+    *   [x] Rewrite README.md
+    *   [x] Create CONTRIBUTING.md
+    *   [x] Create CODE_OF_CONDUCT.md
+    *   [x] Create SECURITY.md
+    *   [x] Create ARCHITECTURE.md
+    *   [x] Create API_REFERENCE.md
+    *   [x] Create TESTING.md
+    *   [x] Create DEPLOYMENT.md
+    *   [x] Create ROADMAP.md
+    *   [x] Create RISK_REGISTER.md
+    *   [x] Create KNOWN_ISSUES.md
+    *   [x] Create STYLE_GUIDE.md
 
 ---
 
@@ -85,7 +85,9 @@ This checklist tracks the execution milestones for NutriChat AI development.
 *   **Owner Agent**: API Engineer
 *   **Completion Checklist**:
     *   [ ] Implement `/api/v1/webhook` verify token endpoint
+    *   [ ] Setup incoming webhook HMAC SHA-256 validation using `X-Hub-Signature-256` header
     *   [ ] Setup parsing logic for incoming text WhatsApp messages
+    *   [ ] Implement `/reset` keyword conversational onboarding reset logic
     *   [ ] Setup parsing logic for WhatsApp image URLs
     *   [ ] Integrate Redis cache for incoming message deduplication
     *   [ ] Mock WhatsApp sending response module
@@ -105,6 +107,21 @@ This checklist tracks the execution milestones for NutriChat AI development.
     *   [ ] Implement serving portion estimation logic
     *   [ ] Setup Edamam REST client for ingredient macros query
     *   [ ] Write barcode matching module using Open Food Facts
+
+### Milestone 3.3: Exercise & Activity Core
+*   **Phase**: AI Phase 1
+*   **Task ID**: `TASK-008`
+*   **Description**: Implement MET-based activity calculations and logging logic.
+*   **Priority**: Medium
+*   **Dependencies**: `TASK-002`
+*   **Estimated Effort**: 8 hours
+*   **Status**: Todo
+*   **Owner Agent**: ML Engineer
+*   **Completion Checklist**:
+    *   [ ] Setup user activity database model mappings
+    *   [ ] Write MET coefficient matching utility function
+    *   [ ] Create `/api/v1/activities/log` endpoint
+    *   [ ] Write calorie adjustment pipeline checks
 
 ---
 

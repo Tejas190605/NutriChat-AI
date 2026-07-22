@@ -75,8 +75,20 @@ CREATE TABLE IF NOT EXISTS food_cache (
     cached_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Table 7: User Exercise & Activity History
+CREATE TABLE IF NOT EXISTS user_activities (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    whatsapp_user_id UUID NOT NULL REFERENCES whatsapp_users(id) ON DELETE CASCADE,
+    activity_name VARCHAR(255) NOT NULL, -- e.g., "running", "walking"
+    duration_minutes DECIMAL(6,2) NOT NULL,
+    MET_value DECIMAL(4,2) NOT NULL,
+    calories_burned INTEGER NOT NULL,
+    time TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Indexes for performance optimization
 CREATE INDEX IF NOT EXISTS idx_meals_user_time ON meals(whatsapp_user_id, time DESC);
 CREATE INDEX IF NOT EXISTS idx_chat_user_timestamp ON chat_histories(whatsapp_user_id, timestamp DESC);
 CREATE INDEX IF NOT EXISTS idx_notifications_active ON notifications(active) WHERE active IS TRUE;
 CREATE INDEX IF NOT EXISTS idx_food_cache_query ON food_cache(food_query);
+CREATE INDEX IF NOT EXISTS idx_activities_user_time ON user_activities(whatsapp_user_id, time DESC);

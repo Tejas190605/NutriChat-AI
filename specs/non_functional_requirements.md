@@ -17,6 +17,7 @@ This specification defines the quality attributes, security boundaries, performa
 ## 2. Performance & Scalability
 
 *   **Webhook Response Latency**: The webhook server must acknowledge incoming Meta payloads within **2.0 seconds** (returning HTTP 200 OK) to prevent Meta from retrying webhook delivery.
+*   **Signature Verification Overhead**: Webhook signature verification using HMAC-SHA256 must execute in under **5ms** so as not to bottleneck the 2s webhook ACK SLA bounds.
 *   **Message Processing Latency**: The complete end-to-end processing (fetching image, Vision AI classification, Edamam lookup, database logging, generating response text) must complete within **8.0 seconds** for 95% of requests.
 *   **Concurrent Users**: Support up to **100 concurrent webhook events** without thread starvation. Set FastAPI workers to `cpu_cores * 2 + 1`.
 
@@ -24,6 +25,8 @@ This specification defines the quality attributes, security boundaries, performa
 
 ## 3. Security & Compliance
 
+*   **Webhook Payload Security**: Mandatory validation of `X-Hub-Signature-256` header on all inbound webhook messages. Payloads missing signatures or with mismatched hashes must be dropped immediately with a 401 Unauthorized response code.
+*   **Credential Protection**: The Facebook App Secret must be stored in production vault managers and loaded dynamically as a masked environment variable (`FACEBOOK_APP_SECRET`).
 *   **Transport Layer Security**: Force HTTPS on all incoming and outgoing connections using TLS 1.3 protocol standards.
 *   **Data Encryption**:
     *   *At rest*: Encrypt columns containing personal user parameters (weight, height, activity level, health goals) inside PostgreSQL using AES-256 standard encryption keys.
