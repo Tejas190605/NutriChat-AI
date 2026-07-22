@@ -68,7 +68,48 @@ sequenceDiagram
 
 ---
 
-## 3. Database ERD (Entity Relationship Diagram)
+## 3. Conversational State Machine
+
+When an incoming message event is delivered, the backend checks the user's registration status. Below is the state machine representation of the onboarding flow:
+
+```mermaid
+stateDiagram-v2
+    [*] --> CheckRegistration
+    CheckRegistration --> Onboarding_Start : User not found
+    CheckRegistration --> ActiveTracking : User exists
+    
+    state Onboarding_Start {
+        [*] --> AskName
+        AskName --> AskHeight : Name received
+        AskHeight --> AskWeight : Height valid
+        AskWeight --> AskGoal : Weight valid
+        AskGoal --> AskActivity : Goal valid
+        AskActivity --> SetTargets : Activity valid
+        SetTargets --> ProfileComplete
+    }
+    
+    ProfileComplete --> ActiveTracking : Onboarding completed
+    
+    state ActiveTracking {
+        [*] --> ParseInput
+        ParseInput --> TextPipeline : Input is Text
+        ParseInput --> VoicePipeline : Input is Audio
+        ParseInput --> VisionPipeline : Input is Image/Photo
+        ParseInput --> BarcodePipeline : Input is Barcode
+        
+        TextPipeline --> SaveLog
+        VoicePipeline --> SaveLog
+        VisionPipeline --> SaveLog
+        BarcodePipeline --> SaveLog
+        
+        SaveLog --> SuggestAlternatives
+        SuggestAlternatives --> [*]
+    }
+```
+
+---
+
+## 4. Database ERD (Entity Relationship Diagram)
 
 ```mermaid
 erDiagram
@@ -83,35 +124,48 @@ erDiagram
         DECIMAL weight
         VARCHAR goal
         VARCHAR activity_level
+        INTEGER target_calories
+        DECIMAL target_protein
+        DECIMAL target_carbs
+        DECIMAL target_fat
         TIMESTAMP created_at
     }
 
     MEALS {
         UUID id PK
-        UUID user_id FK
+        UUID whatsapp_user_id FK
         VARCHAR meal_name
         INTEGER calories
         DECIMAL protein
         DECIMAL carbs
         DECIMAL fat
+        VARCHAR quantity
         VARCHAR image_url
         TIMESTAMP time
     }
 
     CHAT_HISTORIES {
         UUID id PK
-        UUID user_id FK
-        VARCHAR query
-        VARCHAR response
+        UUID whatsapp_user_id FK
+        VARCHAR role
+        VARCHAR message_body
         TIMESTAMP timestamp
     }
 
     NOTIFICATIONS {
         UUID id PK
-        UUID user_id FK
+        UUID whatsapp_user_id FK
         VARCHAR reminder_message
         VARCHAR schedule_cron
         BOOLEAN active
         TIMESTAMP last_sent
     }
 ```
+
+---
+
+## 5. Architectural Quality Standards
+
+*   **DRY & Repository Pattern**: All database queries must inherit from a base repository class to avoid repeating SQLAlchemy connection logic.
+*   **Asynchronous-First**: Route controllers leverage asynchronous databases routines to prevent blocking the worker event loops during heavy concurrent read operations.
+*   **Decoupled AI Engine**: Prompt orchestration classes are isolated from route logic. Changing the underlying vision AI client (e.g. switching from Gemini to OpenAI) requires no modifications to webhook routes.
