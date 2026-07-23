@@ -1,55 +1,170 @@
 services:
-  # FastAPI Backend Service
+  # Managed Key Value (Valkey / Redis) Cache & Message Broker
+  - type: keyvalue
+    name: nutrichat-redis
+    region: singapore
+    plan: free
+    maxmemoryPolicy: allkeys-lru
+    persistenceMode: off
+    ipAllowList: []
+
+  # FastAPI Backend Web Service
   - type: web
     name: nutrichat-backend
-    env: python
+    runtime: python
     region: singapore
-    buildCommand: poetry install --only main
+    plan: free
+    rootDir: backend
+    buildCommand: pip install poetry && poetry config virtualenvs.create false && poetry install --only main
+    preDeployCommand: poetry run alembic upgrade head
     startCommand: poetry run uvicorn src.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/v1/health
     envVars:
       - key: ENV
         value: production
       - key: DEBUG
-        value: false
-      - key: DATABASE_URL
+        value: "false"
+      - key: CORS_ORIGINS
+        fromService:
+          type: web
+          name: nutrichat-frontend
+          property: url
+      - key: POSTGRES_USER
         fromDatabase:
-          name: nutrichat-postgres
-          property: connectionString
+          name: nutrichat-db
+          property: user
+      - key: POSTGRES_PASSWORD
+        fromDatabase:
+          name: nutrichat-db
+          property: password
+      - key: POSTGRES_HOST
+        fromDatabase:
+          name: nutrichat-db
+          property: host
+      - key: POSTGRES_PORT
+        fromDatabase:
+          name: nutrichat-db
+          property: port
+      - key: POSTGRES_DB
+        fromDatabase:
+          name: nutrichat-db
+          property: database
       - key: REDIS_URL
         fromService:
-          type: redis
+          type: keyvalue
           name: nutrichat-redis
           property: connectionString
-      - key: GEMINI_API_KEY
-        sync: false
+      - key: CELERY_BROKER_URL
+        fromService:
+          type: keyvalue
+          name: nutrichat-redis
+          property: connectionString
+      - key: CELERY_RESULT_BACKEND
+        fromService:
+          type: keyvalue
+          name: nutrichat-redis
+          property: connectionString
       - key: JWT_SECRET
         generateValue: true
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: EDAMAM_APP_ID
+        sync: false
+      - key: EDAMAM_APP_KEY
+        sync: false
+      - key: CLOUDINARY_URL
+        sync: false
+      - key: FACEBOOK_APP_SECRET
+        sync: false
+      - key: FACEBOOK_VERIFY_TOKEN
+        sync: false
+      - key: WHATSAPP_PHONE_NUMBER_ID
+        sync: false
+      - key: WHATSAPP_ACCESS_TOKEN
+        sync: false
 
-  # Celery Background Worker
+  # Celery Background Task Worker
   - type: worker
     name: nutrichat-worker
-    env: python
+    runtime: python
     region: singapore
-    buildCommand: poetry install --only main
+    plan: starter
+    rootDir: backend
+    buildCommand: pip install poetry && poetry config virtualenvs.create false && poetry install --only main
     startCommand: poetry run celery -A src.services.celery_app.celery_app worker --loglevel=info
     envVars:
-      - key: DATABASE_URL
+      - key: ENV
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: POSTGRES_USER
         fromDatabase:
-          name: nutrichat-postgres
-          property: connectionString
+          name: nutrichat-db
+          property: user
+      - key: POSTGRES_PASSWORD
+        fromDatabase:
+          name: nutrichat-db
+          property: password
+      - key: POSTGRES_HOST
+        fromDatabase:
+          name: nutrichat-db
+          property: host
+      - key: POSTGRES_PORT
+        fromDatabase:
+          name: nutrichat-db
+          property: port
+      - key: POSTGRES_DB
+        fromDatabase:
+          name: nutrichat-db
+          property: database
       - key: REDIS_URL
         fromService:
-          type: redis
+          type: keyvalue
           name: nutrichat-redis
           property: connectionString
+      - key: CELERY_BROKER_URL
+        fromService:
+          type: keyvalue
+          name: nutrichat-redis
+          property: connectionString
+      - key: CELERY_RESULT_BACKEND
+        fromService:
+          type: keyvalue
+          name: nutrichat-redis
+          property: connectionString
+      - key: JWT_SECRET
+        fromService:
+          type: web
+          name: nutrichat-backend
+          property: envVar
+          envVarKey: JWT_SECRET
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: EDAMAM_APP_ID
+        sync: false
+      - key: EDAMAM_APP_KEY
+        sync: false
+      - key: CLOUDINARY_URL
+        sync: false
+      - key: FACEBOOK_APP_SECRET
+        sync: false
+      - key: FACEBOOK_VERIFY_TOKEN
+        sync: false
+      - key: WHATSAPP_PHONE_NUMBER_ID
+        sync: false
+      - key: WHATSAPP_ACCESS_TOKEN
+        sync: false
 
-  # Next.js Frontend Service
+  # Next.js 15 Frontend Web Service
   - type: web
     name: nutrichat-frontend
-    env: node
+    runtime: node
     region: singapore
-    buildCommand: cd frontend && npm ci && npm run build
-    startCommand: cd frontend && npm start
+    plan: free
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /
     envVars:
       - key: NODE_ENV
         value: production
@@ -60,7 +175,9 @@ services:
           property: url
 
 databases:
-  - name: nutrichat-postgres
-    databaseName: nutrichat_production
+  - name: nutrichat-db
+    databaseName: nutrichat
     user: nutrichat_user
-    plan: starter
+    postgresMajorVersion: "16"
+    plan: free
+    region: singapore
