@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.2.0] - 2026-07-23
+### Added
+*   Next.js 15+ App Router frontend project structure (`frontend/`) configured with TypeScript, Tailwind CSS, Lucide icons, and Recharts.
+*   Custom HSL color palette token design system, frosted glassmorphism styling, and AppProviders wrapper (QueryClient, Theme, Auth, Notification).
+*   Axios API client (`axios.ts`) featuring JWT authorization header injection and 401 response refresh token queue mechanism.
+*   Next.js route protection middleware (`middleware.ts`) enforcing authenticated access for `/dashboard` and `/admin`.
+*   Reusable UI primitive components (`Button`, `Input`, `Select`, `Textarea`, `Checkbox`, `Switch`, `Card`, `StatsCard`, `ChartCard`, `Badge`, `Avatar`, `Skeleton`, `LoadingSpinner`, `EmptyState`, `ErrorState`, `Dialog`, `Modal`, `Drawer`, `Table`, `Pagination`, `Tabs`, `Dropdown`, `Toast`, `Alert`).
+*   Reusable `DataTable` with global search, column sorting, pagination controls, filter dropdowns, row selection, and CSV export.
+*   Reusable Recharts visualizers (`CalorieTrendChart`, `MacroBreakdownChart`, `WeightPredictionChart`, `TelemetryMetricsChart`).
+*   9 Complete Admin Dashboard Feature Modules:
+    - Overview Dashboard (`/dashboard`)
+    - Users Management & Profile Drawer (`/dashboard/users`)
+    - Nutrition & Ingredients Library (`/dashboard/nutrition`)
+    - Meal Logging & History (`/dashboard/meals`)
+    - Analytics Telemetry & US Navy Body Fat Calculator (`/dashboard/analytics`)
+    - AI Orchestration & Interactive Chat Inspector (`/dashboard/ai`)
+    - Vision & OCR Results Gallery (`/dashboard/vision`)
+    - Meta WhatsApp Cloud API Integration (`/dashboard/whatsapp`)
+    - Admin & System Settings (`/dashboard/settings`)
+*   Quality verification: 0 TypeScript errors, 0 ESLint warnings/errors, 2/2 Vitest tests passed, 15/15 Next.js production static routes prerendered.
+*   Comprehensive review documentation in [admin_dashboard_review.md](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/docs/reviews/admin_dashboard_review.md).
+
 ## [0.1.9] - 2026-07-23
 ### Added
 *   18 database models mapping summaries, progress snapshots, body measurements, habits logs, achievements, badges, streaks, insights, coaching sessions, predictions, schedules, and reminders.

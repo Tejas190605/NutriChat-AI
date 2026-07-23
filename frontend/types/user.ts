@@ -25,3 +25,15 @@ export interface UserGoal {
   fat_grams_target: number;
   water_ml_target: number;
 }
+
+export interface User {
+  id: string;
+  email: string;
+  full_name: string;
+  phone_number?: string;
+  role: string;
+  is_active: boolean;
+  created_at: string;
+  profile?: UserProfile;
+  goals?: UserGoal;
+}
