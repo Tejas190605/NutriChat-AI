@@ -297,9 +297,48 @@ erDiagram
 
 ```
 
+
 ---
 
-## 5. Architectural Quality Standards
+## 5. Computer Vision & OCR Upload Pipeline Sequence
+
+Below is the execution flow of the Image Preprocessing, Cloudinary upload, and Celery background task:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Client
+    participant API as FastAPI Upload Route
+    participant Pre as Image Preprocessing (Pillow)
+    participant Storage as Cloudinary / Local Storage
+    participant DB as PostgreSQL
+    participant Task as Celery Worker
+    participant Cache as Redis
+
+    Client->>API: Upload Multipart File (meal.png)
+    API->>Pre: Resize (max 800x800) & Compress (quality 85)
+    Pre-->>API: Return Compressed JPEG Bytes
+    API->>Storage: Upload Image Bytes
+    Storage-->>API: Return Secure Image URL
+    API->>DB: Log FoodImage (status: "uploaded")
+    API->>Task: Dispatch Background task (delay)
+    API-->>Client: Return 201 Created (image_id, url)
+    
+    Task->>DB: Update FoodImage (status: "processing")
+    Task->>Cache: Query cached predictions for URL
+    alt Cache Hit
+        Cache-->>Task: Return Cached Results
+    else Cache Miss
+        Task->>Task: Run Vision & OCR Mock providers
+        Task->>Cache: Set cache results (TTL 24 hours)
+    end
+    Task->>DB: Log VisionPredictions & OCRResults
+    Task->>DB: Update FoodImage (status: "completed")
+```
+
+---
+
+## 6. Architectural Quality Standards
 
 *   **DRY & Repository Pattern**: All database queries must inherit from a base repository class to avoid repeating SQLAlchemy connection logic.
 *   **Asynchronous-First**: Route controllers leverage asynchronous databases routines to prevent blocking the worker event loops during heavy concurrent read operations.

@@ -6,10 +6,10 @@ This document tracks the current status and metrics of the NutriChat AI project.
 
 ## Current Status Summary
 *   **Current Phase**: Phase 5 - Backend Development
-*   **Current Sprint**: Sprint 5 (AI Data Layer)
-*   **Current Module**: AI Data Persistence Layer
-*   **Overall Completion %**: 58%
-*   **Last Updated Timestamp**: 2026-07-23T09:40:00+05:30
+*   **Current Sprint**: Sprint 6 (Computer Vision & OCR Abstraction)
+*   **Current Module**: Computer Vision & OCR Abstraction
+*   **Overall Completion %**: 64%
+*   **Last Updated Timestamp**: 2026-07-23T09:55:00+05:30
 
 ---
 
@@ -47,14 +47,21 @@ This document tracks the current status and metrics of the NutriChat AI project.
 *   [x] Expose CRUD REST API routes for Conversations, Prompt templates, and Recommendations feedbacks
 *   [x] Generate Alembic schema migration script `003_ai_persistence_domain`
 *   [x] Code comprehensive Pytest testing suite validating model properties, prompt service active revisions, feedback submissions, and endpoints parameters (2 passed, 10 skipped on DB offline)
+*   [x] Define StorageProvider, VisionProvider, and OCRProvider abstract interfaces contracts
+*   [x] Implement CloudinaryStorageProvider using standard SDK with local static uploads file system fallback
+*   [x] Design MockVisionProvider and MockOCRProvider emulating food identification and nutrition label facts
+*   [x] Implement image preprocessing pipelines validating, resizing (max 800x800), and compressing (quality 85) using Pillow
+*   [x] Implement VisionOCRPipeline leveraging asynchronous Redis caching connections to prevent duplicate inference executions
+*   [x] Set up background Celery processing worker tasks `process_food_image_task` with task retry policies
+*   [x] Create REST API router endpoint `/api/v1/vision/upload` mounted inside FastAPI main entry point
+*   [x] Code comprehensive test suites validating image preprocessing aspect ratios, caching hits/misses, and endpoint parameter inputs (6 passed, 16 skipped on DB offline)
 
 ### Features In Progress
-*   [/] Pre-sprint planning for Phase 5E - WhatsApp Webhook Routing integration.
+*   [/] Pre-sprint planning for Phase 5F - WhatsApp Webhook Integration.
 
 ### Upcoming Tasks
 *   [ ] Integrate WhatsApp Webhook payload routing.
-*   [ ] Implement OCR parsing for nutritional labels.
-*   [ ] Implement Gemini Vision/LLM agent workflows.
+*   [ ] Implement real OCR / Vision inference services using Gemini APIs.
 
 ---
 

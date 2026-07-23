@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.6] - 2026-07-23
+### Added
+*   StorageProvider, VisionProvider, and OCRProvider interface contracts in [interfaces.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/services/vision/interfaces.py).
+*   `CloudinaryStorageProvider` with local file writing fallback inside [cloudinary_provider.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/services/vision/cloudinary_provider.py).
+*   MockVisionProvider and MockOCRProvider emulating detections and scans in [mock_providers.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/services/vision/mock_providers.py).
+*   Image preprocessing (validation, aspect-ratio resizing, JPEG compression) using Pillow in [preprocessing.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/services/vision/preprocessing.py).
+*   `ImageUploadPipeline` and `VisionOCRPipeline` with Redis caching support in [pipeline.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/services/vision/pipeline.py).
+*   Asynchronous Celery task `process_food_image_task` coordinating food item prediction insertions, portion logging, and backoff retries in [tasks.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/services/vision/tasks.py).
+*   FastAPI router endpoint under `/api/v1/vision/upload` to receive multipart image uploads.
+*   Pillow and Cloudinary package dependencies registered in `pyproject.toml`.
+*   Comprehensive unit tests for preprocessing constraints, Redis cache lookups, and task states updates.
+
+### Fixed
+*   Resolved Pillow type assignment warnings in `preprocessing.py` by annotating the image variable as `Image.Image`.
+*   Resolved keyword signature matching issue in `vision.py` upload route handlers.
+
 ## [0.1.5] - 2026-07-23
 ### Added
 *   14 database models mapping the AI persistence domain (FoodImage, OCRResult, VisionPrediction, AIConversation, AIMessage, PromptTemplate, PromptVersion, AIRequest, AIResponse, Recommendation, RecommendationFeedback, ConfidenceScore, TokenUsage, ModelUsage) in [models/](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/models/).

@@ -1,3 +1,4 @@
+import os
 import time
 from collections.abc import Awaitable, Callable
 from typing import Any
@@ -5,6 +6,7 @@ from typing import Any
 import structlog
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from src.api.health import router as health_router
 from src.api.v1.ai import router as ai_router
@@ -12,6 +14,7 @@ from src.api.v1.auth import router as auth_router
 from src.api.v1.meals import router as meals_router
 from src.api.v1.nutrition import router as nutrition_router
 from src.api.v1.users import router as users_router
+from src.api.v1.vision import router as vision_router
 from src.config.settings import settings
 from src.core.logging_config import configure_logging
 
@@ -71,6 +74,11 @@ app.include_router(users_router, prefix="/api/v1/users", tags=["Users"])
 app.include_router(meals_router, prefix="/api/v1/meals", tags=["Meals"])
 app.include_router(nutrition_router, prefix="/api/v1/nutrition", tags=["Nutrition"])
 app.include_router(ai_router, prefix="/api/v1/ai", tags=["AI Data"])
+app.include_router(vision_router, prefix="/api/v1/vision", tags=["Computer Vision"])
+
+# Mount static folder for serving mock local uploads
+os.makedirs("static/uploads", exist_ok=True)
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 @app.get("/")

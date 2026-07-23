@@ -160,6 +160,24 @@ This checklist tracks the execution milestones for NutriChat AI development.
     *   [ ] Create `/api/v1/activities/log` endpoint
     *   [ ] Write calorie adjustment pipeline checks
 
+### Milestone 3.4: Computer Vision & OCR Abstraction Layer
+*   **Phase**: AI Phase 1
+*   **Task ID**: `TASK-011`
+*   **Description**: Implement interfaces, storage provider wrappers, preprocessing tasks, upload and processing pipelines, Celery worker actions, caching, and upload REST APIs.
+*   **Priority**: High
+*   **Dependencies**: `TASK-010`
+*   **Estimated Effort**: 12 hours
+*   **Status**: Completed
+*   **Owner Agent**: Computer Vision Engineer
+*   **Completion Checklist**:
+    *   [x] Define VisionProvider, OCRProvider, and StorageProvider interface contracts
+    *   [x] Implement Cloudinary uploader with local workspace file system backup fallback
+    *   [x] Implement image preprocessing resizing (max 800x800) and compression (quality 85) using Pillow
+    *   [x] Code ImageUploadPipeline and VisionOCRPipeline coordinating caching with Redis
+    *   [x] Set up background Celery task `process_food_image_task` with exponential retry policies
+    *   [x] Create POST `/api/v1/vision/upload` API router registered in application entry point
+    *   [x] Code comprehensive test suites validating image aspect ratios, cache hits, mock provider outputs, and task execution parameters (6 passed, 16 skipped on DB offline)
+
 ---
 
 ## Epic 4: Analytics & Admin Dashboard

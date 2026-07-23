@@ -287,3 +287,26 @@ All AI persistence routes require JWT authorization `Authorization: Bearer <toke
 *   **Responses**:
     *   **201 Created**
 
+---
+
+## 5. Computer Vision Routes
+
+### Upload Food Image and Process
+*   **Route**: `POST /api/v1/vision/upload`
+*   **Description**: Accepts multipart image file, resizes it using Pillow, uploads it to Cloudinary/local fallback, creates a database log, and dispatches background processing tasks. Requires JWT authorization.
+*   **Request Headers**: `Authorization: Bearer <token>`, `Content-Type: multipart/form-data`
+*   **Request Body**:
+    *   `file`: Binary image file (multipart/form-data)
+*   **Responses**:
+    *   **201 Created**:
+        ```json
+        {
+          "status": "success",
+          "message": "Image uploaded successfully. Background processing started.",
+          "image_id": "4da67eb5-12e3-4f99-8877-ab3b6e82ef22",
+          "image_url": "http://localhost:8000/static/uploads/4da67eb5-12e3-4f99-8877-ab3b6e82ef22.jpg",
+          "image_status": "uploaded"
+        }
+        ```
+
+

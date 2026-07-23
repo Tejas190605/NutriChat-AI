@@ -139,6 +139,7 @@ class AIPromptService:
         # If this version is marked active, deactivate others
         if is_active:
             from sqlalchemy import update
+
             await self.db.execute(
                 update(PromptVersion)
                 .where(PromptVersion.template_id == template_id)
