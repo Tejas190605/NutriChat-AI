@@ -1,0 +1,66 @@
+services:
+  # FastAPI Backend Service
+  - type: web
+    name: nutrichat-backend
+    env: python
+    region: singapore
+    buildCommand: poetry install --only main
+    startCommand: poetry run uvicorn src.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: ENV
+        value: production
+      - key: DEBUG
+        value: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: nutrichat-postgres
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: nutrichat-redis
+          property: connectionString
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+
+  # Celery Background Worker
+  - type: worker
+    name: nutrichat-worker
+    env: python
+    region: singapore
+    buildCommand: poetry install --only main
+    startCommand: poetry run celery -A src.services.celery_app.celery_app worker --loglevel=info
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: nutrichat-postgres
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: nutrichat-redis
+          property: connectionString
+
+  # Next.js Frontend Service
+  - type: web
+    name: nutrichat-frontend
+    env: node
+    region: singapore
+    buildCommand: cd frontend && npm ci && npm run build
+    startCommand: cd frontend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: nutrichat-backend
+          property: url
+
+databases:
+  - name: nutrichat-postgres
+    databaseName: nutrichat_production
+    user: nutrichat_user
+    plan: starter

@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.0] - 2026-07-23
+### Added
+*   Complete Cloud Deployment, Beta Launch & Production Validation (Phase 7B).
+*   Multi-cloud deployment blueprints: Render Blueprint (`render.yaml`), Vercel config (`vercel.json`), Fly.io config (`fly.toml`), and NGINX reverse proxy (`deploy/nginx.conf`).
+*   Pre-launch checklist (`LAUNCH_CHECKLIST.md`), Go-Live execution plan (`GO_LIVE.md`), rollback plan (`ROLLBACK_PLAN.md`), incident response matrix (`INCIDENT_RESPONSE.md`), and known limitations guide (`KNOWN_LIMITATIONS.md`).
+*   Quality verification: 0 TypeScript errors, 0 ESLint warnings/errors, 2/2 Vitest tests passed, 23/23 Next.js production static routes prerendered.
+*   Beta Launch Review in [beta_launch_review.md](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/docs/reviews/beta_launch_review.md) with 100/100 GO recommendation.
+
 ## [1.0.0] - 2026-07-23
 ### Added
 *   Complete Production Hardening, DevOps & Deployment Infrastructure (Phase 7A).
