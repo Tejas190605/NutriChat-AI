@@ -386,4 +386,23 @@ stateDiagram-v2
     ONBOARDING_COMPLETE --> [*] : Create User, Profile, Goals
 ```
 
+---
+
+## 9. Analytics, Coaching & Predictions Layer
+
+The Analytics Engine processes daily logs, tracks compliance scores, calculates US Navy Body Fat estimates, and detects metabolic plateaus:
+
+```mermaid
+graph TD
+    UserMeal[User logs meal logs] --> AsyncCron{Midnight Cron Trigger?}
+    AsyncCron -->|Yes| CalcSummary[AnalyticsEngine.calculate_daily_nutrition_summary]
+    CalcSummary --> StoreSummary[Store in DailyNutritionSummary]
+    
+    UserDashboard([User requests dashboard]) --> GET_Daily[GET /api/v1/analytics/daily]
+    GET_Daily --> GetAdherence[AnalyticsEngine.get_nutritional_score]
+    GET_Daily --> GetInsight[CoachingEngine.generate_daily_coaching]
+    GET_Daily --> ReturnResponse[Return telemetry dashboard payload]
+```
+
+
 

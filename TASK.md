@@ -228,3 +228,21 @@ This checklist tracks the execution milestones for NutriChat AI development.
     *   [ ] Design line charts for daily/weekly active users count
     *   [ ] Write user calorie goal progress meters components
     *   [ ] Setup automated database logs audit view
+
+### Milestone 4.3: Backend Analytics & Coaching Intelligence
+*   **Phase**: Phase 5 Backend
+*   **Task ID**: `TASK-013`
+*   **Description**: Implement analytics engines, body measurements, Navy BF formula, forecasts, reminders, and REST endpoints.
+*   **Priority**: High
+*   **Dependencies**: `TASK-003`
+*   **Estimated Effort**: 12 hours
+*   **Status**: Completed
+*   **Owner Agent**: Business Analyst
+*   **Completion Checklist**:
+    *   [x] Set up database models for Daily/Weekly/Monthly summaries, ProgressSnapshot, and HabitLog
+    *   [x] Write US Navy Body Fat estimation formulas
+    *   [x] Implement PredictionEngine weight trend forecasting
+    *   [x] Build CoachingEngine plateaus detection triggers
+    *   [x] Expose REST endpoints under `/api/v1/analytics`
+    *   [x] Code Pytest unit and integration test suites
+

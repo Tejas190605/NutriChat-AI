@@ -10,6 +10,7 @@ from fastapi.staticfiles import StaticFiles
 
 from src.api.health import router as health_router
 from src.api.v1.ai import router as ai_router
+from src.api.v1.analytics import router as analytics_router
 from src.api.v1.auth import router as auth_router
 from src.api.v1.meals import router as meals_router
 from src.api.v1.nutrition import router as nutrition_router
@@ -80,6 +81,9 @@ app.include_router(orchestration_router, prefix="/api/v1/ai", tags=["AI Orchestr
 app.include_router(vision_router, prefix="/api/v1/vision", tags=["Computer Vision"])
 app.include_router(
     whatsapp_router, prefix="/api/v1/whatsapp", tags=["WhatsApp Webhook"]
+)
+app.include_router(
+    analytics_router, prefix="/api/v1/analytics", tags=["Analytics & Coaching"]
 )
 
 # Mount static folder for serving mock local uploads

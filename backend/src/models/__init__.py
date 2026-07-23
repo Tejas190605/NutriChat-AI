@@ -76,4 +76,36 @@ __all__ = [
     "ConfidenceScore",
     "TokenUsage",
     "ModelUsage",
+    "DailyNutritionSummary",
+    "WeeklyNutritionSummary",
+    "MonthlyNutritionSummary",
+    "DailyActivitySummary",
+    "WeeklyActivitySummary",
+    "GoalProgress",
+    "ProgressSnapshot",
+    "BodyMeasurement",
+    "Habit",
+    "HabitLog",
+    "Streak",
+    "Badge",
+    "Achievement",
+    "Insight",
+    "CoachingSession",
+    "Prediction",
+    "NotificationSchedule",
+    "Reminder",
 ]
+
+from src.models.achievement import Achievement, Badge
+from src.models.analytics_summary import (
+    DailyActivitySummary,
+    DailyNutritionSummary,
+    GoalProgress,
+    MonthlyNutritionSummary,
+    WeeklyActivitySummary,
+    WeeklyNutritionSummary,
+)
+from src.models.coaching import CoachingSession, Insight, Prediction
+from src.models.habit import Habit, HabitLog, Streak
+from src.models.progress import BodyMeasurement, ProgressSnapshot
+from src.models.reminder import NotificationSchedule, Reminder

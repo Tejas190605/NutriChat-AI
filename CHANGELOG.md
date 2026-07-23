@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.9] - 2026-07-23
+### Added
+*   18 database models mapping summaries, progress snapshots, body measurements, habits logs, achievements, badges, streaks, insights, coaching sessions, predictions, schedules, and reminders.
+*   `AnalyticsEngine` calculating calorie totals, weekly trends, BMI, US Navy Body Fat estimation formulas, and macro adherence metrics in [analytics_engine.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/services/analytics/analytics_engine.py).
+*   `PredictionEngine` computing linear weight trend forecasts and goal completion target dates in [prediction_engine.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/services/analytics/prediction_engine.py).
+*   `CoachingEngine` detecting weight plateaus and scheduling daily coaching messages in [coaching_engine.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/services/analytics/coaching_engine.py).
+*   `RecommendationIntelligence` suggestions and alternative swaps builders in [recommendation_intel.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/services/analytics/recommendation_intel.py).
+*   REST API endpoints under `/api/v1/analytics` exposing daily/weekly/predictions telemetry in [analytics.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/api/v1/analytics.py).
+*   Alembic migration revision file [004_analytics_coaching_domain.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/migrations/versions/004_analytics_coaching_domain.py).
+*   Automated test suites validating US Navy Body Fat equations, forecasts, and API routes in [test_analytics_intelligence.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/tests/test_analytics_intelligence.py).
+
+## [0.1.8] - 2026-07-23
+### Added
+*   Outbound WhatsApp Cloud API sender, buttons, list templates, and media download wrapper in [client.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/services/whatsapp/client.py).
+*   Redis session-backed Onboarding State Machine transitioning user profile registrations in [state_machine.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/services/whatsapp/state_machine.py).
+*   HMAC SHA-256 webhook signature verifier and routes in [whatsapp.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/api/v1/whatsapp.py).
+*   Replay lock protections and message dispatchers in [router.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/services/whatsapp/router.py).
+*   Celery tasks handling media downloads and incoming messages processing.
+*   Pytest suite verifying GET/POST webhooks, signature rejections, and state machine transitions in [test_whatsapp_integration.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/tests/test_whatsapp_integration.py).
+
 ## [0.1.7] - 2026-07-23
 ### Added
 *   Abstract `LLMProvider` interface in [interfaces.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/services/ai/interfaces.py).

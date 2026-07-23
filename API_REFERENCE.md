@@ -409,6 +409,41 @@ All AI orchestration routes require JWT authorization `Authorization: Bearer <to
 *   **Route**: `GET /api/v1/whatsapp/admin/sessions`
 *   **Description**: Lists active onboarding state metrics cached in Redis. Requires JWT admin context.
 
+---
+
+## 8. Analytics & Coaching Routes
+
+### Daily Dashboard Telemetry
+*   **Route**: `GET /api/v1/analytics/daily`
+*   **Description**: Fetch daily calorie totals, macronutrient splits values, water count, and compliance score metrics.
+*   **Responses**:
+    *   **200 OK**: Daily summaries payload.
+
+### Weekly Trends Summaries
+*   **Route**: `GET /api/v1/analytics/weekly`
+*   **Description**: Fetch weekly averages, and US Navy Body Fat estimation index telemetry.
+*   **Responses**:
+    *   **200 OK**: Weekly aggregates dashboard.
+
+### Weight Predictions & Goal Timelines
+*   **Route**: `GET /api/v1/analytics/predictions`
+*   **Description**: Forecasts weight trajectories and estimated target completion dates.
+*   **Responses**:
+    *   **200 OK**: Predictions forecast list.
+
+### Coaching Insights & Plateaus Warnings
+*   **Route**: `GET /api/v1/analytics/insights`
+*   **Description**: Fetch personalized motivational coach tips, plateaus alerts, and targeted exercise recommendations.
+*   **Responses**:
+    *   **200 OK**: Insight details model.
+
+### Custom Substitutions Suggestions
+*   **Route**: `GET /api/v1/analytics/recommendations`
+*   **Description**: Returns remaining macros suggestions and healthy substitutions swaps.
+*   **Responses**:
+    *   **200 OK**: Swaps recommendation payload.
+
+
 
 
 
