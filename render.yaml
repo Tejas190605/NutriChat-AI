@@ -16,7 +16,6 @@ services:
     plan: free
     rootDir: backend
     buildCommand: pip install poetry && poetry config virtualenvs.create false && poetry install --only main
-    preDeployCommand: poetry run alembic upgrade head
     startCommand: poetry run uvicorn src.main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /api/v1/health
     envVars:
@@ -28,7 +27,7 @@ services:
         fromService:
           type: web
           name: nutrichat-frontend
-          property: url
+          property: host
       - key: POSTGRES_USER
         fromDatabase:
           name: nutrichat-db
@@ -136,7 +135,6 @@ services:
         fromService:
           type: web
           name: nutrichat-backend
-          property: envVar
           envVarKey: JWT_SECRET
       - key: GEMINI_API_KEY
         sync: false
@@ -172,7 +170,7 @@ services:
         fromService:
           type: web
           name: nutrichat-backend
-          property: url
+          property: host
 
 databases:
   - name: nutrichat-db
