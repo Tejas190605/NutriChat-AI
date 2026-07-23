@@ -81,11 +81,14 @@ This document tracks the current status and metrics of the NutriChat AI project.
 *   [x] Create reusable `DataTable` (search, sorting, pagination, filtering, CSV export) and `CalorieTrendChart`, `MacroBreakdownChart`, `WeightPredictionChart`, `TelemetryMetricsChart`
 *   [x] Verify TypeScript (0 errors), ESLint (0 warnings/errors), Vitest (2/2 passed), and Next.js production build (15/15 prerendered static routes)
 *   [x] Build 14 User Portal specialized components (`MealCard`, `MacroProgress`, `WaterTracker`, `WeightCard`, `AchievementCard`, `InsightCard`, `Timeline`, `ProgressRing`, `GoalCard`, `AIChatBubble`, `ImageUploader`, `NutritionSummary`, `PredictionCard`)
-*   [x] Build 10 User Portal App Router pages (`/home`, `/profile`, `/meals`, `/meal-analysis`, `/ai-coach`, `/progress`, `/history`, `/goals`, `/analytics`, `/settings`)
-*   [x] Verify TypeScript (0 errors), ESLint (0 warnings/errors), Vitest (2/2 passed), and Next.js production build (22/22 prerendered static routes)
+*   [x] Build Web App Manifest (`manifest.ts`) and Service Worker (`sw.js`) handling offline caching, background sync, and push notifications
+*   [x] Build native IndexedDB store (`indexeddb.ts`) and Automatic Offline Replay Engine (`sync-engine.ts`)
+*   [x] Build Web Push VAPID notification helper (`vapid.ts`) and Real-Time EventSource subscriber (`sse-client.ts`)
+*   [x] Build PWA & Mobile UI components (`PwaInstallPrompt`, `OfflineBanner`, `NotificationPrompt`, `BottomNavigation`)
+*   [x] Verify TypeScript (0 errors), ESLint (0 warnings/errors), Vitest (2/2 passed), and Next.js production build (23/23 prerendered static routes)
 
 ### Features In Progress
-*   *Phase 6C User Portal & AI Health Coach completed successfully.*
+*   *Phase 6D PWA, Offline-First, Real-Time & Mobile Experience completed successfully.*
 
 ### Upcoming Tasks
 *   [ ] Integration testing with live backend PostgreSQL & Redis database containers.

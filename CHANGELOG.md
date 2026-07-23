@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.4.0] - 2026-07-23
+### Added
+*   Complete Progressive Web App (PWA), Offline-First Engine, Real-Time Event Layer & Mobile Navigation Experience (`frontend/`).
+*   Next.js Web App Manifest generator (`app/manifest.ts`) specifying standalone mode, shortcuts, theme colors (`#020617`, `#10b981`), and PWA icons.
+*   Service Worker (`public/sw.js`) handling Stale-While-Revalidate caching, runtime API fallback caching, background push events, and notification click navigation.
+*   Service Worker registration & lifecycle manager (`lib/pwa/sw-register.ts`).
+*   Native IndexedDB storage wrapper (`lib/offline/indexeddb.ts`) for pending offline meal logs, weight updates, and profile edits.
+*   Automatic Offline Replay Sync Engine (`lib/offline/sync-engine.ts`) listening to browser `online` network events and replaying queued mutations.
+*   Web Push VAPID notification manager (`lib/notifications/vapid.ts`) and Real-Time EventSource/SSE subscriber (`lib/realtime/sse-client.ts`).
+*   PWA & Mobile UI components: `PwaInstallPrompt`, `OfflineBanner`, `NotificationPrompt`, `BottomNavigation`.
+*   Quality verification: 0 TypeScript errors, 0 ESLint warnings/errors, 2/2 Vitest tests passed, 23/23 Next.js production static routes prerendered.
+*   Comprehensive review documentation in [pwa_mobile_review.md](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/docs/reviews/pwa_mobile_review.md).
+
 ## [0.3.0] - 2026-07-23
 ### Added
 *   Complete User Portal & AI Health Coach frontend application experience (`frontend/`).
