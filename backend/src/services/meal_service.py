@@ -1,7 +1,7 @@
 import uuid
 from datetime import UTC, date, datetime, timedelta
-from uuid import UUID
 from typing import Any
+from uuid import UUID
 
 import structlog
 from sqlalchemy import select
@@ -157,7 +157,9 @@ class MealService:
         """Retrieves user's meal history logged within a range."""
         return await self.meal_repo.get_user_meals_in_range(user_id, start_dt, end_dt)
 
-    async def get_daily_summary(self, user_id: UUID, target_date: date) -> dict[str, Any]:
+    async def get_daily_summary(
+        self, user_id: UUID, target_date: date
+    ) -> dict[str, Any]:
         """Aggregates consumed calories and macro values vs active goals for a date."""
         start_dt = datetime.combine(target_date, datetime.min.time(), tzinfo=UTC)
         end_dt = datetime.combine(target_date, datetime.max.time(), tzinfo=UTC)
@@ -199,7 +201,9 @@ class MealService:
             "consumed_fat": round(consumed_fat, 1),
         }
 
-    async def get_weekly_summary(self, user_id: UUID, start_date: date) -> dict[str, Any]:
+    async def get_weekly_summary(
+        self, user_id: UUID, start_date: date
+    ) -> dict[str, Any]:
         """Computes weekly totals, grouping calories/macros logged per day."""
         days_dict = {}
         total_cal = 0

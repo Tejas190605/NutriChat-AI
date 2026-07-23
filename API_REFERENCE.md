@@ -161,3 +161,129 @@ This catalog details the backend API routes, payloads, and response payloads.
           "meal_id": "99f3c10a-8a4f-4d37-83b6-2856db326577"
         }
         ```
+
+---
+
+## 4. AI Persistence Routes
+
+All AI persistence routes require JWT authorization `Authorization: Bearer <token>`.
+
+### Start a Conversation Session
+*   **Route**: `POST /api/v1/ai/conversations`
+*   **Description**: Starts a new AI conversation session thread tracker.
+*   **Request Body**:
+    ```json
+    {
+      "title": "Onboarding Coaching"
+    }
+    ```
+*   **Responses**:
+    *   **201 Created**: Returns the conversation response.
+
+### List Conversations
+*   **Route**: `GET /api/v1/ai/conversations`
+*   **Description**: Returns active conversation threads logged for the current user.
+*   **Responses**:
+    *   **200 OK**: List of active conversation metadata objects.
+
+### Retrieve Conversation Details & Message History
+*   **Route**: `GET /api/v1/ai/conversations/{conversation_id}`
+*   **Description**: Returns messages history list within a conversation thread context.
+*   **Responses**:
+    *   **200 OK**: Full details dictionary including messages list arrays.
+
+### Append a Message
+*   **Route**: `POST /api/v1/ai/conversations/{conversation_id}/messages`
+*   **Description**: Logs a user/assistant reply to the thread history.
+*   **Request Body**:
+    ```json
+    {
+      "role": "user",
+      "content": "Need customized target deficit suggestions",
+      "tokens": 15
+    }
+    ```
+*   **Responses**:
+    *   **201 Created**: Returns message details response.
+
+### Update Conversation Title or Status
+*   **Route**: `PUT /api/v1/ai/conversations/{conversation_id}`
+*   **Description**: Updates title or closes active conversation logs.
+*   **Request Body**:
+    ```json
+    {
+      "title": "New Title",
+      "is_active": false
+    }
+    ```
+*   **Responses**:
+    *   **200 OK**: Returns updated conversation response.
+
+### Delete Conversation
+*   **Route**: `DELETE /api/v1/ai/conversations/{conversation_id}`
+*   **Description**: Soft deletes conversation session history records.
+*   **Responses**:
+    *   **204 No Content**
+
+### Create Prompt Template Header
+*   **Route**: `POST /api/v1/ai/prompts/templates`
+*   **Description**: Registers a prompt category identifier.
+*   **Request Body**:
+    ```json
+    {
+      "name": "coaching_agent",
+      "description": "Standard prompt template rules"
+    }
+    ```
+*   **Responses**:
+    *   **201 Created**: Returns prompt template header response.
+
+### Create Prompt Version
+*   **Route**: `POST /api/v1/ai/prompts/templates/{template_id}/versions`
+*   **Description**: Pushes template formatting guidelines version.
+*   **Request Body**:
+    ```json
+    {
+      "version": 1,
+      "system_prompt": "You are a health coach.",
+      "user_prompt_template": "Analyze: {food}",
+      "model_name": "gemini-1.5-flash",
+      "temperature": 0.5,
+      "is_active": true
+    }
+    ```
+*   **Responses**:
+    *   **201 Created**: Returns prompt version template response.
+
+### Fetch Active Prompt Version Config
+*   **Route**: `GET /api/v1/ai/prompts/templates/{name}/active`
+*   **Description**: Returns active guidelines prompt instructions config.
+*   **Responses**:
+    *   **200 OK**: Active prompt version response.
+
+### Log a Recommendation
+*   **Route**: `POST /api/v1/ai/recommendations`
+*   **Description**: Logs recommendation suggestions generated.
+*   **Request Body**:
+    ```json
+    {
+      "category": "alternative",
+      "content": {"swap": "brown rice"}
+    }
+    ```
+*   **Responses**:
+    *   **201 Created**
+
+### Log Recommendation Feedback
+*   **Route**: `POST /api/v1/ai/recommendations/{recommendation_id}/feedback`
+*   **Description**: Logs ratings feedback for a swap recommendation.
+*   **Request Body**:
+    ```json
+    {
+      "feedback_value": "liked",
+      "comments": "Great swap advice!"
+    }
+    ```
+*   **Responses**:
+    *   **201 Created**
+

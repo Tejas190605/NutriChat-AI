@@ -1,3 +1,16 @@
+from src.repositories.ai import (
+    AIConversationRepository,
+    AIMessageRepository,
+    FoodImageRepository,
+    ModelUsageRepository,
+    OCRResultRepository,
+    PromptTemplateRepository,
+    PromptVersionRepository,
+    RecommendationFeedbackRepository,
+    RecommendationRepository,
+    TokenUsageRepository,
+    VisionPredictionRepository,
+)
 from src.repositories.barcode import BarcodeRepository
 from src.repositories.base import BaseRepository
 from src.repositories.meal import MealRepository
@@ -20,4 +33,15 @@ __all__ = [
     "RecentFoodRepository",
     "MealRepository",
     "BarcodeRepository",
+    "AIConversationRepository",
+    "AIMessageRepository",
+    "PromptTemplateRepository",
+    "PromptVersionRepository",
+    "RecommendationRepository",
+    "RecommendationFeedbackRepository",
+    "FoodImageRepository",
+    "OCRResultRepository",
+    "VisionPredictionRepository",
+    "TokenUsageRepository",
+    "ModelUsageRepository",
 ]

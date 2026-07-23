@@ -7,6 +7,7 @@ from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.api.health import router as health_router
+from src.api.v1.ai import router as ai_router
 from src.api.v1.auth import router as auth_router
 from src.api.v1.meals import router as meals_router
 from src.api.v1.nutrition import router as nutrition_router
@@ -69,6 +70,7 @@ app.include_router(auth_router, prefix="/api/v1/auth", tags=["Authentication"])
 app.include_router(users_router, prefix="/api/v1/users", tags=["Users"])
 app.include_router(meals_router, prefix="/api/v1/meals", tags=["Meals"])
 app.include_router(nutrition_router, prefix="/api/v1/nutrition", tags=["Nutrition"])
+app.include_router(ai_router, prefix="/api/v1/ai", tags=["AI Data"])
 
 
 @app.get("/")

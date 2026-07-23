@@ -90,6 +90,24 @@ This checklist tracks the execution milestones for NutriChat AI development.
     *   [x] Generate Alembic migration file `002_nutrition_domain`
     *   [x] Code comprehensive Pytest test suite verifying endpoints and macro aggregations
 
+### Milestone 2.4: AI Data Persistence Domain (Foundation)
+*   **Phase**: Backend Phase 1
+*   **Task ID**: `TASK-010`
+*   **Description**: Implement database models, validation schemas, repositories, business services, and CRUD API routers for the AI persistence layer (conversations, prompt versions, recommendations feedback, usage stats, and model analytic logs).
+*   **Priority**: High
+*   **Dependencies**: `TASK-009`
+*   **Estimated Effort**: 12 hours
+*   **Status**: Completed
+*   **Owner Agent**: Backend Architect
+*   **Completion Checklist**:
+    *   [x] Create 14 AI persistence database models with UUID PKs, index structures, unique constraints, relationship properties, and soft-delete parameters
+    *   [x] Write Pydantic v2 schemas validating conversation payloads, promptsTemplates modifications, recommendations, and feedbacks
+    *   [x] Build repositories pattern wrapping queries for prompt versions and feedback lists
+    *   [x] Code AIConversationService, AIPromptService, RecommendationService, VisionPersistenceService, and AIAnalyticsService business algorithms
+    *   [x] Expose REST endpoints for Conversations, Prompt templates, and Recommendations feedbacks CRUD operations
+    *   [x] Generate Alembic schema migration script `003_ai_persistence_domain`
+    *   [x] Code pytest suites verifying models operations, services functions, and router inputs checks (2 passed, 10 skipped on DB offline)
+
 ---
 
 ## Epic 3: AI Pipeline & Integrations

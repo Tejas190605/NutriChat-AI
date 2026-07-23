@@ -136,6 +136,17 @@ erDiagram
     USERS ||--o{ CHAT_HISTORIES : "stores"
     USERS ||--o{ NOTIFICATIONS : "manages"
     USERS ||--o{ USER_ACTIVITIES : "performs"
+    USERS ||--o{ FOOD_IMAGES : "uploads"
+    USERS ||--o{ AI_CONVERSATIONS : "starts"
+    USERS ||--o{ RECOMMENDATIONS : "receives"
+    FOOD_IMAGES ||--o{ OCR_RESULTS : "parses"
+    FOOD_IMAGES ||--o{ VISION_PREDICTIONS : "classifies"
+    AI_CONVERSATIONS ||--o{ AI_MESSAGES : "contains"
+    PROMPT_TEMPLATES ||--o{ PROMPT_VERSIONS : "versions"
+    PROMPT_VERSIONS ||--o{ AI_REQUESTS : "formats"
+    AI_REQUESTS ||--o| AI_RESPONSES : "resolves"
+    AI_REQUESTS ||--o{ TOKEN_USAGES : "measures"
+    RECOMMENDATIONS ||--o{ RECOMMENDATION_FEEDBACK : "collects"
 
     USERS {
         UUID id PK
@@ -190,6 +201,100 @@ erDiagram
         INTEGER calories_burned
         TIMESTAMP time
     }
+
+    FOOD_IMAGES {
+        UUID id PK
+        UUID user_id FK
+        VARCHAR image_url
+        VARCHAR status
+        TIMESTAMP created_at
+    }
+
+    OCR_RESULTS {
+        UUID id PK
+        UUID food_image_id FK
+        TEXT raw_text
+        JSON parsed_json
+        TIMESTAMP created_at
+    }
+
+    VISION_PREDICTIONS {
+        UUID id PK
+        UUID food_image_id FK
+        VARCHAR label
+        DECIMAL confidence
+        JSON box_coordinates
+        TIMESTAMP created_at
+    }
+
+    AI_CONVERSATIONS {
+        UUID id PK
+        UUID user_id FK
+        VARCHAR title
+        BOOLEAN is_active
+        TIMESTAMP created_at
+    }
+
+    AI_MESSAGES {
+        UUID id PK
+        UUID conversation_id FK
+        VARCHAR role
+        TEXT content
+        INTEGER tokens
+        TIMESTAMP created_at
+    }
+
+    PROMPT_TEMPLATES {
+        UUID id PK
+        VARCHAR name
+        VARCHAR description
+        TIMESTAMP created_at
+    }
+
+    PROMPT_VERSIONS {
+        UUID id PK
+        UUID template_id FK
+        INTEGER version
+        TEXT system_prompt
+        TEXT user_prompt_template
+        VARCHAR model_name
+        DECIMAL temperature
+        BOOLEAN is_active
+        TIMESTAMP created_at
+    }
+
+    AI_REQUESTS {
+        UUID id PK
+        UUID user_id FK
+        UUID prompt_version_id FK
+        JSON request_payload
+        TIMESTAMP created_at
+    }
+
+    AI_RESPONSES {
+        UUID id PK
+        UUID request_id FK
+        JSON response_payload
+        INTEGER latency_ms
+        TIMESTAMP created_at
+    }
+
+    RECOMMENDATIONS {
+        UUID id PK
+        UUID user_id FK
+        VARCHAR category
+        JSON content
+        TIMESTAMP created_at
+    }
+
+    RECOMMENDATION_FEEDBACK {
+        UUID id PK
+        UUID recommendation_id FK
+        VARCHAR feedback_value
+        VARCHAR comments
+        TIMESTAMP created_at
+    }
+
 ```
 
 ---

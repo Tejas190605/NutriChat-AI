@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.5] - 2026-07-23
+### Added
+*   14 database models mapping the AI persistence domain (FoodImage, OCRResult, VisionPrediction, AIConversation, AIMessage, PromptTemplate, PromptVersion, AIRequest, AIResponse, Recommendation, RecommendationFeedback, ConfidenceScore, TokenUsage, ModelUsage) in [models/](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/models/).
+*   Pydantic validation schemas checking session creation parameters, messages creation parameters, prompts templates creations, recommendation requests, and feedback metrics in [schemas/](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/schemas/).
+*   Asynchronous repositories wrapping conversation history retrievals, prompt lookups, and model aggregated analytics cost counters in [repositories/](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/repositories/).
+*   AIConversationService, AIPromptService, RecommendationService, VisionPersistenceService, and AIAnalyticsService managing state changes, deactivating duplicate active version configs, logging CV coordinates, and tracking execution latencies.
+*   REST endpoint routers under `/api/v1/ai` exposing conversations list/starts/deletes, message history replies, prompts templating versions, and suggestions feedback loggers.
+*   Alembic migration revision script [003_ai_persistence_domain.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/migrations/versions/003_ai_persistence_domain.py) managing SQL tables declarations and indexes optimizations.
+*   Thorough testing coverage validating active model configurations, token costs, rating feedback logging, and router parameter inputs.
+
+### Fixed
+*   Resolved MyPy generic type assignments errors inside `ai_service.py` by compiling standard SQLAlchemy `update` expressions.
+*   Resolved MyPy variable type checks inside `ai.py` route controllers by declaring `update_dict` types explicitly as `dict[str, Any]`.
+
 ## [0.1.4] - 2026-07-23
 ### Added
 *   13 database models mapping the nutrition domain (Food, FoodCategory, Ingredient, Meal, MealItem, NutritionProfile, NutritionFact, BarcodeProduct, NutritionLabel, RestaurantMenu, GroceryProduct, FavoriteFood, RecentFood) in [models/](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/models/).
