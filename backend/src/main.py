@@ -13,6 +13,7 @@ from src.api.v1.ai import router as ai_router
 from src.api.v1.auth import router as auth_router
 from src.api.v1.meals import router as meals_router
 from src.api.v1.nutrition import router as nutrition_router
+from src.api.v1.orchestration import router as orchestration_router
 from src.api.v1.users import router as users_router
 from src.api.v1.vision import router as vision_router
 from src.config.settings import settings
@@ -74,6 +75,7 @@ app.include_router(users_router, prefix="/api/v1/users", tags=["Users"])
 app.include_router(meals_router, prefix="/api/v1/meals", tags=["Meals"])
 app.include_router(nutrition_router, prefix="/api/v1/nutrition", tags=["Nutrition"])
 app.include_router(ai_router, prefix="/api/v1/ai", tags=["AI Data"])
+app.include_router(orchestration_router, prefix="/api/v1/ai", tags=["AI Orchestration"])
 app.include_router(vision_router, prefix="/api/v1/vision", tags=["Computer Vision"])
 
 # Mount static folder for serving mock local uploads

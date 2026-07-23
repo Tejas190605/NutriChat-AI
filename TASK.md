@@ -178,6 +178,24 @@ This checklist tracks the execution milestones for NutriChat AI development.
     *   [x] Create POST `/api/v1/vision/upload` API router registered in application entry point
     *   [x] Code comprehensive test suites validating image aspect ratios, cache hits, mock provider outputs, and task execution parameters (6 passed, 16 skipped on DB offline)
 
+### Milestone 3.5: AI Orchestration Engine & Gemini Integration
+*   **Phase**: AI Phase 1
+*   **Task ID**: `TASK-012`
+*   **Description**: Build AIOrchestrator, ConversationMemory context compression, safety validator checks, meal analyzer pipelines, recommendation deficits calculations, and expose rest chat/recommend/analyze endpoints.
+*   **Priority**: High
+*   **Dependencies**: `TASK-011`
+*   **Estimated Effort**: 14 hours
+*   **Status**: Completed
+*   **Owner Agent**: LLM Engineer
+*   **Completion Checklist**:
+    *   [x] Define LLMProvider interfaces and configure GeminiProvider with circuit breakers
+    *   [x] Implement FallbackProvider secondary completions failover
+    *   [x] Build SafetyValidator input content filtering scanning
+    *   [x] Code ConversationMemory window characters calculations and summarizations compression
+    *   [x] Build MealAnalyzer and RecommendationEngine calculations layers
+    *   [x] Register REST API routes `/api/v1/ai/chat`, `/api/v1/ai/analyze-meal`, `/api/v1/ai/recommend` and `/api/v1/ai/history`
+    *   [x] Code comprehensive tests validating safety validator keyword rejections, summarizations triggers, and endpoints (7 passed, 21 skipped successfully)
+
 ---
 
 ## Epic 4: Analytics & Admin Dashboard

@@ -343,3 +343,26 @@ sequenceDiagram
 *   **DRY & Repository Pattern**: All database queries must inherit from a base repository class to avoid repeating SQLAlchemy connection logic.
 *   **Asynchronous-First**: Route controllers leverage asynchronous databases routines to prevent blocking the worker event loops during heavy concurrent read operations.
 *   **Decoupled AI Engine**: Prompt orchestration classes are isolated from route logic. Changing the underlying vision AI client (e.g. switching from Gemini to OpenAI) requires no modifications to webhook routes.
+
+---
+
+## 7. AI Orchestration Flow
+
+The orchestration engine coordinates conversational safety, context loading, memory management, and provider routing:
+
+```mermaid
+graph TD
+    User([Inbound Message]) --> Safety[SafetyValidator.validate_input]
+    Safety -->|Safe| LogUserMsg[Log User Message to DB]
+    LogUserMsg --> Memory[ConversationMemory.get_chat_context]
+    Memory -->|Tokens > Limit| Compress[Compress Context & Summarize]
+    Memory -->|Tokens <= Limit| FetchPrompt[Fetch Active Prompt Template]
+    Compress --> FetchPrompt
+    FetchPrompt --> PrimaryLLM{GeminiProvider Call}
+    PrimaryLLM -->|Success| SaveReply[Log Assistant Response to DB]
+    PrimaryLLM -->|Failure / Circuit Tripped| FallbackLLM[FallbackProvider Call]
+    FallbackLLM --> SaveReply
+    SaveReply --> LogUsage[Log Token Usage & Cost Stats]
+    LogUsage --> ReturnResponse([Return Chat Reply])
+```
+

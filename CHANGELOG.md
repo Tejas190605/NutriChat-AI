@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.1.7] - 2026-07-23
+### Added
+*   Abstract `LLMProvider` interface in [interfaces.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/services/ai/interfaces.py).
+*   `GeminiProvider` utilizing the official SDK with exponential retry backoffs, timeouts, circuit breakers, and mock fallbacks in [gemini_provider.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/services/ai/gemini_provider.py).
+*   `FallbackProvider` serving synthetic replies during failover in [fallback_provider.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/services/ai/fallback_provider.py).
+*   `SafetyValidator` input text scanners and `PromptRenderer` compiling configurations in [prompt_engine.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/services/ai/prompt_engine.py).
+*   `ConversationMemory` character-based token tracking and window summarization compression in [memory.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/services/ai/memory.py).
+*   `MealAnalyzer` visual and OCR macronutrients aggregator in [meal_analyzer.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/services/ai/meal_analyzer.py).
+*   `RecommendationEngine` target deficit calculators and Indian swaps recommender in [recommendation_engine.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/services/ai/recommendation_engine.py).
+*   `AIOrchestrator` central orchestrator coordinating chat pipelines and logs cost in [orchestrator.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/services/ai/orchestrator.py).
+*   FastAPI endpoints under `/api/v1/ai` prefix mapping `/chat`, `/analyze-meal`, `/recommend`, and `/history` inside [orchestration.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/api/v1/orchestration.py).
+*   Custom list query `get_conversation_messages` inside [repositories/ai.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/repositories/ai.py).
+*   `google-generativeai` SDK package dependency in `pyproject.toml`.
+*   Comprehensive unit tests for safety triggers, context compressions, and API endpoints.
+
+### Fixed
+*   Resolved linter issues regarding unused method parameters in `FallbackProvider`.
+*   Resolved MyPy type issues mapping goal metrics from UserGoal.
+
 ## [0.1.6] - 2026-07-23
 ### Added
 *   StorageProvider, VisionProvider, and OCRProvider interface contracts in [interfaces.py](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/backend/src/services/vision/interfaces.py).

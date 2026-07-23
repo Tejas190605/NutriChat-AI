@@ -309,4 +309,73 @@ All AI persistence routes require JWT authorization `Authorization: Bearer <toke
         }
         ```
 
+---
+
+## 6. AI Orchestration Routes
+
+All AI orchestration routes require JWT authorization `Authorization: Bearer <token>`.
+
+### Chat Message Processing
+*   **Route**: `POST /api/v1/ai/chat`
+*   **Description**: Submits a user chat query to be parsed, checked for safety, executed against Gemini, and stored in conversation history.
+*   **Request Body**:
+    ```json
+    {
+      "conversation_id": "a67eb54d-12e3-4f99-8877-ab3b6e82ef33",
+      "message": "Can I eat paneer on a low-fat diet?"
+    }
+    ```
+*   **Responses**:
+    *   **200 OK**:
+        ```json
+        {
+          "reply": "Paneer is a great source of protein, but standard paneer is high in fats. Consider swapping for low-fat paneer or tofu."
+        }
+        ```
+
+### Analyze Meal Image
+*   **Route**: `POST /api/v1/ai/analyze-meal`
+*   **Description**: Triggers vision and OCR pipeline analysis to extract macro breakdowns from an uploaded food image.
+*   **Request Body**:
+    ```json
+    {
+      "image_id": "4da67eb5-12e3-4f99-8877-ab3b6e82ef22"
+    }
+    ```
+*   **Responses**:
+    *   **200 OK**:
+        ```json
+        {
+          "foods": [
+            {
+              "label": "Roti Paneer",
+              "confidence": 0.91,
+              "portion": "1.0 serving",
+              "weight_grams": 250.0,
+              "calories": 450
+            }
+          ],
+          "total_calories": 450,
+          "total_protein": 20.0,
+          "total_carbs": 62.5,
+          "total_fat": 15.0,
+          "confidence_score": 0.91
+        }
+        ```
+
+### Generate Recommendations
+*   **Route**: `POST /api/v1/ai/recommend`
+*   **Description**: Calculates macro budgets deficits vs user goals and generates customized coaching suggestions and swaps.
+*   **Responses**:
+    *   **200 OK**: Returns aggregated target splits, consumed counts, remaining numbers, and swaps list.
+
+### Retrieve Conversation History Logs
+*   **Route**: `GET /api/v1/ai/history`
+*   **Description**: Returns all message logs stored under a specific conversation thread.
+*   **Query Parameters**:
+    *   `conversation_id`: string (UUID)
+*   **Responses**:
+    *   **200 OK**: Message history list.
+
+
 

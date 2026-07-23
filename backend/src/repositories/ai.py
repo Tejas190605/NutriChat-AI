@@ -50,6 +50,16 @@ class AIMessageRepository(BaseRepository[AIMessage]):
     def __init__(self, db: AsyncSession):
         super().__init__(AIMessage, db)
 
+    async def get_conversation_messages(self, conversation_id: UUID) -> list[AIMessage]:
+        """Retrieves all messages matching a conversation thread session context."""
+        stmt = (
+            select(self.model)
+            .filter(self.model.conversation_id == conversation_id)
+            .order_by(self.model.created_at.asc())
+        )
+        res = await self.db.execute(stmt)
+        return list(res.scalars().all())
+
 
 class PromptTemplateRepository(BaseRepository[PromptTemplate]):
     """Repository for PromptTemplate metadata operations."""
