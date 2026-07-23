@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.0] - 2026-07-23
+### Added
+*   Complete Production Hardening, DevOps & Deployment Infrastructure (Phase 7A).
+*   Multi-stage standalone `frontend/Dockerfile` image (~120MB) with non-root user `nextjs` and container health checks.
+*   Production Docker Compose cluster (`docker-compose.prod.yml`) provisioning PostgreSQL 16, Redis 7, FastAPI, Celery, Next.js, Prometheus, and Grafana.
+*   Environment variable templates: `.env.production.example`, `.env.staging.example`, `.env.development.example`.
+*   GitHub Actions CI/CD workflows (`ci.yml`, `cd.yml`) automating linting, type-checking, unit tests, Docker builds, and container registry publishing.
+*   Production HTTP security headers configured in `next.config.ts` (HSTS, CSP, X-Frame-Options DENY, X-Content-Type-Options nosniff, Referrer-Policy, Permissions-Policy).
+*   Prometheus telemetry scraper (`monitoring/prometheus.yml`) and Grafana production dashboard (`monitoring/grafana/dashboards.json`).
+*   k6 API load testing script (`tests/load/k6_api_benchmark.js`).
+*   Automated database & Redis backup/restore scripts (`scripts/backup_db.sh`, `scripts/restore_db.sh`).
+*   Production documentation suite: `DEPLOYMENT.md`, `OPERATIONS.md`, `RUNBOOK.md`, `SECURITY.md`, `BACKUP.md`, `MONITORING.md`.
+*   Quality verification: 0 TypeScript errors, 0 ESLint warnings/errors, 2/2 Vitest tests passed, 23/23 Next.js production static routes prerendered.
+*   Comprehensive review documentation in [production_readiness_review.md](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/docs/reviews/production_readiness_review.md).
+
 ## [0.4.0] - 2026-07-23
 ### Added
 *   Complete Progressive Web App (PWA), Offline-First Engine, Real-Time Event Layer & Mobile Navigation Experience (`frontend/`).

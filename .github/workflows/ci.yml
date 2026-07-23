@@ -1,49 +1,71 @@
-name: Backend CI Pipeline
+name: NutriChat AI CI Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, develop ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, develop ]
 
 jobs:
-  validate:
+  backend-checks:
+    name: Backend Lint, Type-Check & Pytest
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Python 3.11
+      - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Install Poetry
-        run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+        run: pip install poetry==1.8.2
 
-      - name: Install dependencies
+      - name: Install Backend Dependencies
         working-directory: ./backend
-        run: |
-          poetry install
+        run: poetry install --only main
 
-      - name: Run Black formatting check
+      - name: Run Ruff Linter
         working-directory: ./backend
-        run: |
-          poetry run black --check src/
+        run: poetry run ruff check .
 
-      - name: Run Ruff Lint check
+      - name: Run MyPy Type Check
         working-directory: ./backend
-        run: |
-          poetry run ruff check src/
+        run: poetry run mypy src/
 
-      - name: Run MyPy Type check
+      - name: Run Pytest Test Suite
         working-directory: ./backend
-        run: |
-          poetry run mypy src/
+        run: poetry run pytest
 
-      - name: Run Pytest test suite
-        working-directory: ./backend
-        run: |
-          poetry run pytest
+  frontend-checks:
+    name: Frontend Lint, Type-Check & Vitest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+          cache-dependency-path: ./frontend/package-lock.json
+
+      - name: Install Frontend Dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Run ESLint
+        working-directory: ./frontend
+        run: npm run lint
+
+      - name: Run TypeScript Check
+        working-directory: ./frontend
+        run: npm run type-check
+
+      - name: Run Vitest Unit Tests
+        working-directory: ./frontend
+        run: npm run test
+
+      - name: Next.js Production Build
+        working-directory: ./frontend
+        run: npm run build

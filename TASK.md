@@ -249,3 +249,23 @@ This checklist tracks the execution milestones for NutriChat AI development.
     *   [x] Expose REST endpoints under `/api/v1/analytics`
     *   [x] Code Pytest unit and integration test suites
 
+### Milestone 7.1: Production Hardening, DevOps & Deployment
+*   **Phase**: Phase 7 DevOps & Production
+*   **Task ID**: `TASK-014`
+*   **Description**: Hardened Docker builds, environment templates, GitHub Actions CI/CD, security headers, Prometheus/Grafana monitoring, load benchmarks, and backup scripts.
+*   **Priority**: High
+*   **Dependencies**: All Phase 5 & 6 Tasks
+*   **Estimated Effort**: 16 hours
+*   **Status**: Completed
+*   **Owner Agent**: Cloud Architect / DevOps
+*   **Completion Checklist**:
+    *   [x] Build hardened multi-stage standalone `frontend/Dockerfile` with non-root user `nextjs`
+    *   [x] Create production Docker Compose cluster (`docker-compose.prod.yml`)
+    *   [x] Create environment templates (`.env.production.example`, `.env.staging.example`, `.env.development.example`)
+    *   [x] Create GitHub Actions CI/CD workflows (`ci.yml`, `cd.yml`)
+    *   [x] Configure Next.js HTTP security headers in `next.config.ts`
+    *   [x] Set up Prometheus (`prometheus.yml`) & Grafana (`dashboards.json`) monitoring
+    *   [x] Write k6 load test script (`k6_api_benchmark.js`)
+    *   [x] Write database backup and restore scripts (`backup_db.sh`, `restore_db.sh`)
+    *   [x] Write production guides (`DEPLOYMENT.md`, `OPERATIONS.md`, `RUNBOOK.md`, `SECURITY.md`, `BACKUP.md`, `MONITORING.md`)
+    *   [x] Complete verification (0 TypeScript errors, 0 ESLint warnings/errors, 23/23 prerendered static routes)

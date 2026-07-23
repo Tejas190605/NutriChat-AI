@@ -85,13 +85,22 @@ This document tracks the current status and metrics of the NutriChat AI project.
 *   [x] Build native IndexedDB store (`indexeddb.ts`) and Automatic Offline Replay Engine (`sync-engine.ts`)
 *   [x] Build Web Push VAPID notification helper (`vapid.ts`) and Real-Time EventSource subscriber (`sse-client.ts`)
 *   [x] Build PWA & Mobile UI components (`PwaInstallPrompt`, `OfflineBanner`, `NotificationPrompt`, `BottomNavigation`)
+*   [x] Build hardened multi-stage standalone `frontend/Dockerfile` with non-root user `nextjs` and container health check
+*   [x] Create production Docker Compose cluster (`docker-compose.prod.yml`) for PostgreSQL 16, Redis 7, FastAPI, Celery, Next.js, Prometheus, Grafana
+*   [x] Create environment variable templates (`.env.production.example`, `.env.staging.example`, `.env.development.example`)
+*   [x] Create GitHub Actions CI/CD workflows (`ci.yml`, `cd.yml`)
+*   [x] Configure Next.js HTTP security headers in `next.config.ts` (HSTS, CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy)
+*   [x] Set up Prometheus (`prometheus.yml`) & Grafana (`dashboards.json`) monitoring configurations
+*   [x] Write k6 load test script (`k6_api_benchmark.js`)
+*   [x] Write database backup and restore scripts (`backup_db.sh`, `restore_db.sh`)
+*   [x] Write production operation guides (`DEPLOYMENT.md`, `OPERATIONS.md`, `RUNBOOK.md`, `SECURITY.md`, `BACKUP.md`, `MONITORING.md`)
 *   [x] Verify TypeScript (0 errors), ESLint (0 warnings/errors), Vitest (2/2 passed), and Next.js production build (23/23 prerendered static routes)
 
 ### Features In Progress
-*   *Phase 6D PWA, Offline-First, Real-Time & Mobile Experience completed successfully.*
+*   *Phase 7A Production Hardening, DevOps & Deployment completed successfully.*
 
 ### Upcoming Tasks
-*   [ ] Integration testing with live backend PostgreSQL & Redis database containers.
+*   [ ] Live production deployment on Render / AWS infrastructure.
 
 ---
 
