@@ -1,16 +1,20 @@
+from uuid import uuid4
+
 import pytest
 from httpx import AsyncClient
-from uuid import uuid4
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.services.auth_service import AuthService
 
 
 @pytest.mark.asyncio
-async def test_user_profile_and_goals_api(client: AsyncClient, db_session: AsyncSession) -> None:
+async def test_user_profile_and_goals_api(
+    client: AsyncClient, db_session: AsyncSession
+) -> None:
     """Verifies that user profile, goal logging, and weight history endpoint operations behave correctly."""
     if db_session is None:
         pytest.skip("Database is offline")
-        
+
     email = f"user_{uuid4()}@nutrichat.ai"
     password = "secure_password_123"
 
@@ -35,7 +39,7 @@ async def test_user_profile_and_goals_api(client: AsyncClient, db_session: Async
             "gender": "male",
             "height": 180.0,
             "weight": 85.0,
-        }
+        },
     )
     assert profile_response.status_code == 200
     profile_data = profile_response.json()
@@ -45,9 +49,7 @@ async def test_user_profile_and_goals_api(client: AsyncClient, db_session: Async
 
     # 3. Calculate and Save Goals (/me/goals)
     goal_response = await client.post(
-        "/api/v1/users/me/goals",
-        headers=headers,
-        json={"goal_type": "weight_loss"}
+        "/api/v1/users/me/goals", headers=headers, json={"goal_type": "weight_loss"}
     )
     assert goal_response.status_code == 200
     goal_data = goal_response.json()
@@ -57,9 +59,7 @@ async def test_user_profile_and_goals_api(client: AsyncClient, db_session: Async
 
     # 4. Log Weight Entry (/me/weight)
     weight_response = await client.post(
-        "/api/v1/users/me/weight",
-        headers=headers,
-        json={"weight": 84.5}
+        "/api/v1/users/me/weight", headers=headers, json={"weight": 84.5}
     )
     assert weight_response.status_code == 201
     weight_data = weight_response.json()

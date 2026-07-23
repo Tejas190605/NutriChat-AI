@@ -366,3 +366,24 @@ graph TD
     LogUsage --> ReturnResponse([Return Chat Reply])
 ```
 
+---
+
+## 8. WhatsApp Integration & Onboarding State Machine
+
+The WhatsApp Cloud API webhook handles incoming payloads and drives step-by-step onboarding sequences:
+
+```mermaid
+stateDiagram-v2
+    [*] --> WELCOME : First message received
+    WELCOME --> ONBOARDING_NAME : Ask Name
+    ONBOARDING_NAME --> ONBOARDING_AGE : Save Name, Ask Age
+    ONBOARDING_AGE --> ONBOARDING_GENDER : Save Age, Ask Gender
+    ONBOARDING_GENDER --> ONBOARDING_HEIGHT : Save Gender, Ask Height
+    ONBOARDING_HEIGHT --> ONBOARDING_WEIGHT : Save Height, Ask Weight
+    ONBOARDING_WEIGHT --> ONBOARDING_ACTIVITY : Save Weight, Ask Activity Level
+    ONBOARDING_ACTIVITY --> ONBOARDING_GOAL : Save Activity, Ask Goal
+    ONBOARDING_GOAL --> ONBOARDING_COMPLETE : Onboarding Finished
+    ONBOARDING_COMPLETE --> [*] : Create User, Profile, Goals
+```
+
+

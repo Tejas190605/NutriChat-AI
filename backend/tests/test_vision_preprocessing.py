@@ -1,6 +1,8 @@
-import pytest
 from io import BytesIO
+
+import pytest
 from PIL import Image
+
 from src.services.vision.preprocessing import preprocess_image
 
 
@@ -14,12 +16,12 @@ def test_image_preprocessing_resizing_and_compression() -> None:
 
     # 2. Preprocess raw PNG bytes
     processed_bytes = preprocess_image(raw_png_bytes, max_size=(800, 800), quality=85)
-    
+
     # 3. Assertions
     processed_img = Image.open(BytesIO(processed_bytes))
     assert processed_img.format == "JPEG"
     assert processed_img.mode == "RGB"
-    
+
     # Aspect ratio validation: 1200x900 -> ratio 4:3. Max dimension 800.
     # New size should be 800x600.
     assert processed_img.size == (800, 600)

@@ -1,12 +1,13 @@
-import pytest
-import json
 from io import BytesIO
 from uuid import uuid4
+
+import pytest
 from PIL import Image
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.services.vision.pipeline import ImageUploadPipeline, VisionOCRPipeline
-from src.services.vision.mock_providers import MockVisionProvider, MockOCRProvider
+
 from src.services.redis_client import get_redis_client
+from src.services.vision.mock_providers import MockVisionProvider
+from src.services.vision.pipeline import ImageUploadPipeline, VisionOCRPipeline
 from src.services.vision.tasks import async_process_food_image
 
 
@@ -17,7 +18,7 @@ async def test_image_upload_pipeline(db_session: AsyncSession) -> None:
         pytest.skip("Database is offline")
 
     user_id = uuid4()
-    
+
     # 1. Create dummy image
     img = Image.new("RGB", (100, 100), color=(0, 255, 0))
     io_buf = BytesIO()
@@ -57,7 +58,7 @@ async def test_vision_ocr_pipeline_caching() -> None:
     assert detected_first[0]["label"] == "Green Salad"
 
     # 2. Modify value in mock provider to verify cache hit returns old value
-    pipeline.vision = MockVisionProvider() # resets
+    pipeline.vision = MockVisionProvider()  # resets
     detected_second = await pipeline.detect_food(image_url)
     assert detected_second == detected_first
 
@@ -75,7 +76,7 @@ async def test_background_celery_task_processing(db_session: AsyncSession) -> No
         pytest.skip("Database is offline")
 
     user_id = uuid4()
-    
+
     # 1. Upload dummy food image first
     img = Image.new("RGB", (100, 100), color=(0, 255, 0))
     io_buf = BytesIO()
@@ -88,7 +89,7 @@ async def test_background_celery_task_processing(db_session: AsyncSession) -> No
         file_bytes=raw_bytes,
         original_filename="salad.jpg",
     )
-    
+
     # Ensure image_id is fully persisted
     await db_session.commit()
 

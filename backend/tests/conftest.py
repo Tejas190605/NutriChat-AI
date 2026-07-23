@@ -1,11 +1,13 @@
 import asyncio
 from collections.abc import AsyncGenerator, Generator
+
 import pytest
-from httpx import AsyncClient, ASGITransport
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from httpx import ASGITransport, AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+
 from src.config.settings import settings
-from src.db.session import get_async_session
 from src.db.base import Base
+from src.db.session import get_async_session
 from src.main import app
 
 # Create isolated test database engine
@@ -46,9 +48,9 @@ async def init_test_db() -> AsyncGenerator[None, None]:
     except Exception:
         print("\n[Warning] Test Database is offline. Skipping schema initializations.")
         DATABASE_ONLINE = False
-        
+
     yield
-    
+
     if has_db:
         try:
             async with test_engine.begin() as conn:
@@ -77,15 +79,15 @@ async def db_session() -> AsyncGenerator[AsyncSession | None, None]:
 @pytest.fixture
 async def client(db_session: AsyncSession | None) -> AsyncGenerator[AsyncClient, None]:
     """Async HTTP Client fixture wrapping FastAPI, with overridden DB dependencies."""
-    
+
     async def override_get_async_session() -> AsyncGenerator[AsyncSession | None, None]:
         yield db_session
 
     app.dependency_overrides[get_async_session] = override_get_async_session
-    
+
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"
     ) as ac:
         yield ac
-        
+
     app.dependency_overrides.clear()

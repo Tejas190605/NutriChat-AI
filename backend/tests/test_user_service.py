@@ -1,9 +1,11 @@
-import pytest
-from uuid import uuid4
 from datetime import date
+from uuid import uuid4
+
+import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.services.user_service import UserService
+
 from src.schemas.profile import UserProfileUpdateRequest
+from src.services.user_service import UserService
 
 
 @pytest.mark.asyncio
@@ -11,7 +13,7 @@ async def test_user_profile_management(db_session: AsyncSession) -> None:
     """Verifies profile creation, retrieve, and updates."""
     if db_session is None:
         pytest.skip("Database is offline")
-        
+
     user_id = uuid4()
     user_service = UserService(db_session)
 
@@ -45,7 +47,7 @@ async def test_goal_calculation_formula(db_session: AsyncSession) -> None:
     """Verifies MSJ formula calculations for active goals."""
     if db_session is None:
         pytest.skip("Database is offline")
-        
+
     user_id = uuid4()
     user_service = UserService(db_session)
 
@@ -64,7 +66,7 @@ async def test_goal_calculation_formula(db_session: AsyncSession) -> None:
     )
     assert goal.goal_type == "weight_loss"
     assert goal.is_active is True
-    
+
     # Check calorie calculations
     assert goal.target_calories is not None
     assert 1950 <= goal.target_calories <= 2000

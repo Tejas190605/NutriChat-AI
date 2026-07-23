@@ -118,16 +118,16 @@ This checklist tracks the execution milestones for NutriChat AI development.
 *   **Priority**: High
 *   **Dependencies**: `TASK-002`
 *   **Estimated Effort**: 10 hours
-*   **Status**: Todo
+*   **Status**: Completed
 *   **Owner Agent**: API Engineer
 *   **Completion Checklist**:
-    *   [ ] Implement `/api/v1/webhook` verify token endpoint
-    *   [ ] Setup incoming webhook HMAC SHA-256 validation using `X-Hub-Signature-256` header
-    *   [ ] Setup parsing logic for incoming text WhatsApp messages
-    *   [ ] Implement `/reset` keyword conversational onboarding reset logic
-    *   [ ] Setup parsing logic for WhatsApp image URLs
-    *   [ ] Integrate Redis cache for incoming message deduplication
-    *   [ ] Mock WhatsApp sending response module
+    *   [x] Implement `/api/v1/webhook` verify token endpoint
+    *   [x] Setup incoming webhook HMAC SHA-256 validation using `X-Hub-Signature-256` header
+    *   [x] Setup parsing logic for incoming text WhatsApp messages
+    *   [x] Implement `/reset` keyword conversational onboarding reset logic
+    *   [x] Setup parsing logic for WhatsApp image URLs
+    *   [x] Integrate Redis cache for incoming message deduplication
+    *   [x] Mock WhatsApp sending response module
 
 ### Milestone 3.2: Food Recognition & Nutrition Parsing
 *   **Phase**: AI Phase 1

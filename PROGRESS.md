@@ -6,10 +6,10 @@ This document tracks the current status and metrics of the NutriChat AI project.
 
 ## Current Status Summary
 *   **Current Phase**: Phase 5 - Backend Development
-*   **Current Sprint**: Sprint 7 (AI Orchestration Engine)
-*   **Current Module**: AI Orchestration Engine
-*   **Overall Completion %**: 70%
-*   **Last Updated Timestamp**: 2026-07-23T10:30:00+05:30
+*   **Current Sprint**: Sprint 8 (WhatsApp API Integration)
+*   **Current Module**: WhatsApp Cloud API Integration
+*   **Overall Completion %**: 77%
+*   **Last Updated Timestamp**: 2026-07-23T10:45:00+05:30
 
 ---
 
@@ -62,13 +62,17 @@ This document tracks the current status and metrics of the NutriChat AI project.
 *   [x] Implement MealAnalyzer and RecommendationEngine performing macros calculations and compiling Indian swaps suggestions
 *   [x] Register REST API routes `/api/v1/ai/chat`, `/api/v1/ai/analyze-meal`, `/api/v1/ai/recommend` and `/api/v1/ai/history`
 *   [x] Code automated test suites validating safety filters, context compression thresholds, and API routes parameter validators (7 passed, 21 skipped successfully)
+*   [x] Create POST /webhook signature check HMAC SHA-256 validation (X-Hub-Signature-256) and GET challenge response webhooks
+*   [x] Implement WhatsAppClient for outbound button templates, quick replies, lists, and media files download
+*   [x] Implement ConversationStateMachine managing Redis onboarding sessions with 24-hour TTL limits
+*   [x] Build WhatsAppRouter checking message locks for replay protection and dispatching background Celery tasks
+*   [x] Code comprehensive tests validating webhook challenges, signature acceptance, duplicate message locks, and state machine transitions (10 passed, 23 skipped successfully)
 
 ### Features In Progress
-*   [/] Pre-sprint planning for Phase 5G - WhatsApp Webhook Integration.
+*   [/] Sprint planning for Epic 4 - Admin Dashboard Front-End Layer.
 
 ### Upcoming Tasks
-*   [ ] Integrate WhatsApp Webhook payload routing.
-*   [ ] Implement real OCR / Vision inference services using Gemini APIs.
+*   [ ] Initialize React + Next.js dashboard project with Tailwind configurations.
 
 ---
 

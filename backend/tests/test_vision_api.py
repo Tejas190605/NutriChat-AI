@@ -1,14 +1,18 @@
+from io import BytesIO
+from uuid import uuid4
+
 import pytest
 from httpx import AsyncClient
-from uuid import uuid4
-from io import BytesIO
 from PIL import Image
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.services.auth_service import AuthService
 
 
 @pytest.mark.asyncio
-async def test_vision_upload_api_endpoint(client: AsyncClient, db_session: AsyncSession) -> None:
+async def test_vision_upload_api_endpoint(
+    client: AsyncClient, db_session: AsyncSession
+) -> None:
     """Verifies that authenticated users can upload image files to `/api/v1/vision/upload`."""
     if db_session is None:
         pytest.skip("Database is offline")
@@ -27,7 +31,7 @@ async def test_vision_upload_api_endpoint(client: AsyncClient, db_session: Async
     output = BytesIO()
     img.save(output, format="JPEG")
     img_bytes = output.getvalue()
-    
+
     files = {"file": ("meal_photo.jpg", img_bytes, "image/jpeg")}
 
     # 3. Post to upload endpoint

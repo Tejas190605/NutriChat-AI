@@ -16,6 +16,7 @@ from src.api.v1.nutrition import router as nutrition_router
 from src.api.v1.orchestration import router as orchestration_router
 from src.api.v1.users import router as users_router
 from src.api.v1.vision import router as vision_router
+from src.api.v1.whatsapp import router as whatsapp_router
 from src.config.settings import settings
 from src.core.logging_config import configure_logging
 
@@ -77,6 +78,9 @@ app.include_router(nutrition_router, prefix="/api/v1/nutrition", tags=["Nutritio
 app.include_router(ai_router, prefix="/api/v1/ai", tags=["AI Data"])
 app.include_router(orchestration_router, prefix="/api/v1/ai", tags=["AI Orchestration"])
 app.include_router(vision_router, prefix="/api/v1/vision", tags=["Computer Vision"])
+app.include_router(
+    whatsapp_router, prefix="/api/v1/whatsapp", tags=["WhatsApp Webhook"]
+)
 
 # Mount static folder for serving mock local uploads
 os.makedirs("static/uploads", exist_ok=True)

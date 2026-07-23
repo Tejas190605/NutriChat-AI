@@ -1,12 +1,16 @@
+from uuid import uuid4
+
 import pytest
 from httpx import AsyncClient
-from uuid import uuid4
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.services.auth_service import AuthService
 
 
 @pytest.mark.asyncio
-async def test_ai_persistence_api_endpoints(client: AsyncClient, db_session: AsyncSession) -> None:
+async def test_ai_persistence_api_endpoints(
+    client: AsyncClient, db_session: AsyncSession
+) -> None:
     """Verifies that all CRUD endpoints in the AI persistence API layer function correctly."""
     if db_session is None:
         pytest.skip("Database is offline")
@@ -45,7 +49,9 @@ async def test_ai_persistence_api_endpoints(client: AsyncClient, db_session: Asy
     assert msg_response.json()["role"] == "user"
 
     # 4. Get Conversation details and history list
-    get_response = await client.get(f"/api/v1/ai/conversations/{conv_id}", headers=headers)
+    get_response = await client.get(
+        f"/api/v1/ai/conversations/{conv_id}", headers=headers
+    )
     assert get_response.status_code == 200
     assert len(get_response.json()["messages"]) == 1
 
@@ -60,7 +66,9 @@ async def test_ai_persistence_api_endpoints(client: AsyncClient, db_session: Asy
     assert update_response.json()["is_active"] is False
 
     # 6. Delete Conversation
-    delete_response = await client.delete(f"/api/v1/ai/conversations/{conv_id}", headers=headers)
+    delete_response = await client.delete(
+        f"/api/v1/ai/conversations/{conv_id}", headers=headers
+    )
     assert delete_response.status_code == 204
 
     # 7. Create Prompt Template
@@ -85,13 +93,15 @@ async def test_ai_persistence_api_endpoints(client: AsyncClient, db_session: Asy
             "model_name": "gemini-1.5-flash",
             "temperature": 0.5,
             "is_active": True,
-        }
+        },
     )
     assert version_response.status_code == 201
     assert version_response.json()["is_active"] is True
 
     # 9. Get Active Prompt Version
-    active_response = await client.get(f"/api/v1/ai/prompts/templates/{template_name}/active", headers=headers)
+    active_response = await client.get(
+        f"/api/v1/ai/prompts/templates/{template_name}/active", headers=headers
+    )
     assert active_response.status_code == 200
     assert active_response.json()["version"] == 1
 

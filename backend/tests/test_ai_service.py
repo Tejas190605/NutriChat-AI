@@ -1,17 +1,21 @@
-import pytest
 from uuid import uuid4
+
+import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.services.ai_service import (
+    AIAnalyticsService,
     AIConversationService,
     AIPromptService,
     RecommendationService,
     VisionPersistenceService,
-    AIAnalyticsService,
 )
 
 
 @pytest.mark.asyncio
-async def test_conversations_prompts_and_recommendations_services(db_session: AsyncSession) -> None:
+async def test_conversations_prompts_and_recommendations_services(
+    db_session: AsyncSession,
+) -> None:
     """Verifies that all core services of the AI persistence data layer behave as expected."""
     if db_session is None:
         pytest.skip("Database is offline")
@@ -39,7 +43,9 @@ async def test_conversations_prompts_and_recommendations_services(db_session: As
     assert msg.tokens == 10
 
     # 2. Test AIPromptService
-    template = await prompt_service.create_template(name="meal_parsing", description="Parses meal logs")
+    template = await prompt_service.create_template(
+        name="meal_parsing", description="Parses meal logs"
+    )
     assert template.name == "meal_parsing"
 
     version = await prompt_service.create_version(
@@ -75,13 +81,19 @@ async def test_conversations_prompts_and_recommendations_services(db_session: As
     assert feedback.feedback_value == "liked"
 
     # 4. Test VisionPersistenceService
-    img = await vision_service.log_food_image(user_id=user_id, image_url="http://example.com/food.jpg")
+    img = await vision_service.log_food_image(
+        user_id=user_id, image_url="http://example.com/food.jpg"
+    )
     assert img.status == "uploaded"
 
-    ocr = await vision_service.log_ocr_result(food_image_id=img.id, raw_text="Protein: 10g", parsed_json={"protein": 10})
+    ocr = await vision_service.log_ocr_result(
+        food_image_id=img.id, raw_text="Protein: 10g", parsed_json={"protein": 10}
+    )
     assert ocr.raw_text == "Protein: 10g"
 
-    pred = await vision_service.log_prediction(food_image_id=img.id, label="Apple", confidence=0.95)
+    pred = await vision_service.log_prediction(
+        food_image_id=img.id, label="Apple", confidence=0.95
+    )
     assert pred.label == "Apple"
 
     # 5. Test AIAnalyticsService

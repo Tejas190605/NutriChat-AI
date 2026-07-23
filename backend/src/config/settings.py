@@ -40,6 +40,8 @@ class Settings(BaseSettings):
     # Webhook Verification
     FACEBOOK_APP_SECRET: str = Field(default="dev_facebook_app_secret")
     FACEBOOK_VERIFY_TOKEN: str = Field(default="dev_facebook_verify_token")
+    WHATSAPP_PHONE_NUMBER_ID: str = Field(default="dev_phone_number_id")
+    WHATSAPP_ACCESS_TOKEN: str = Field(default="dev_whatsapp_access_token")
 
     # AI & Macros APIs
     GEMINI_API_KEY: str = Field(default="dev_gemini_key")

@@ -377,5 +377,38 @@ All AI orchestration routes require JWT authorization `Authorization: Bearer <to
 *   **Responses**:
     *   **200 OK**: Message history list.
 
+---
+
+## 7. WhatsApp Webhook & Admin Routes
+
+### Webhook Verification GET Responder
+*   **Route**: `GET /api/v1/whatsapp/webhook`
+*   **Description**: Meta subscription challenge verify token checks.
+*   **Query Parameters**:
+    *   `hub.mode`: string (`subscribe`)
+    *   `hub.verify_token`: string (facebook verify token)
+    *   `hub.challenge`: string (challenge verification)
+*   **Responses**:
+    *   **200 OK**: Returns the challenge text.
+    *   **403 Forbidden**: Token mismatch.
+
+### Webhook Receiver POST Handler
+*   **Route**: `POST /api/v1/whatsapp/webhook`
+*   **Description**: Receives incoming Meta messaging payload updates, checks signature verification, deduplicates, and routes tasks.
+*   **Request Headers**:
+    *   `X-Hub-Signature-256`: `sha256=<signature_hex>`
+*   **Responses**:
+    *   **200 OK**: Status success confirmation.
+    *   **401 Unauthorized**: Signature check mismatch.
+
+### Webhook Health Status Logger
+*   **Route**: `GET /api/v1/whatsapp/admin/health`
+*   **Description**: Returns diagnostics logs list of incoming payloads. Requires JWT admin context.
+
+### Onboarding Sessions Inspector
+*   **Route**: `GET /api/v1/whatsapp/admin/sessions`
+*   **Description**: Lists active onboarding state metrics cached in Redis. Requires JWT admin context.
+
+
 
 

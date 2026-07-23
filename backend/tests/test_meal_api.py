@@ -1,12 +1,16 @@
+from uuid import uuid4
+
 import pytest
 from httpx import AsyncClient
-from uuid import uuid4
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.services.auth_service import AuthService
 
 
 @pytest.mark.asyncio
-async def test_meals_api_endpoints(client: AsyncClient, db_session: AsyncSession) -> None:
+async def test_meals_api_endpoints(
+    client: AsyncClient, db_session: AsyncSession
+) -> None:
     """Verifies all meal endpoint routes handle requests correctly."""
     if db_session is None:
         pytest.skip("Database is offline")
@@ -37,7 +41,7 @@ async def test_meals_api_endpoints(client: AsyncClient, db_session: AsyncSession
                 }
             ],
             "image_url": "http://image.url",
-        }
+        },
     )
     assert response.status_code == 201
     meal_data = response.json()
@@ -51,7 +55,7 @@ async def test_meals_api_endpoints(client: AsyncClient, db_session: AsyncSession
         params={
             "start_date": "2026-07-22T00:00:00Z",
             "end_date": "2026-07-24T00:00:00Z",
-        }
+        },
     )
     assert hist_response.status_code == 200
     assert len(hist_response.json()) == 1
@@ -89,7 +93,7 @@ async def test_meals_api_endpoints(client: AsyncClient, db_session: AsyncSession
                     "fat": 1.5,
                 }
             ],
-        }
+        },
     )
     assert update_response.status_code == 200
     assert update_response.json()["name"] == "Updated Lunch"

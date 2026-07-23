@@ -1,15 +1,19 @@
+from uuid import uuid4
+
 import pytest
 from httpx import AsyncClient
-from uuid import uuid4
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.services.auth_service import AuthService
+
 from src.models.food import Food
 from src.models.nutrition_fact import NutritionFact
 from src.models.nutrition_profile import NutritionProfile
+from src.services.auth_service import AuthService
 
 
 @pytest.mark.asyncio
-async def test_nutrition_api_endpoints(client: AsyncClient, db_session: AsyncSession) -> None:
+async def test_nutrition_api_endpoints(
+    client: AsyncClient, db_session: AsyncSession
+) -> None:
     """Verifies that all food lookup and favorites API handlers process request inputs correctly."""
     if db_session is None:
         pytest.skip("Database is offline")
@@ -46,9 +50,7 @@ async def test_nutrition_api_endpoints(client: AsyncClient, db_session: AsyncSes
 
     # 1. Lookup banana
     lookup_response = await client.get(
-        "/api/v1/nutrition/lookup",
-        headers=headers,
-        params={"query": "Sweet"}
+        "/api/v1/nutrition/lookup", headers=headers, params={"query": "Sweet"}
     )
     assert lookup_response.status_code == 200
     assert len(lookup_response.json()) == 1

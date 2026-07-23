@@ -1,12 +1,13 @@
-import pytest
 from uuid import uuid4
+
+import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.services.nutrition_service import NutritionService
-from src.repositories.nutrition import FoodRepository
+
+from src.models.barcode import BarcodeProduct
 from src.models.food import Food
 from src.models.nutrition_fact import NutritionFact
 from src.models.nutrition_profile import NutritionProfile
-from src.models.barcode import BarcodeProduct
+from src.services.nutrition_service import NutritionService
 
 
 @pytest.mark.asyncio
@@ -17,7 +18,6 @@ async def test_nutrition_lookups_and_favorites(db_session: AsyncSession) -> None
 
     user_id = uuid4()
     service = NutritionService(db_session)
-    food_repo = FoodRepository(db_session)
 
     # 1. Create a food item inside catalog for lookup
     fact = NutritionFact(

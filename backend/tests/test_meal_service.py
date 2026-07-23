@@ -1,9 +1,11 @@
-import pytest
+from datetime import UTC, date, datetime
 from uuid import uuid4
-from datetime import datetime, UTC, date
+
+import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
-from src.services.meal_service import MealService
+
 from src.schemas.meal import MealItemCreate
+from src.services.meal_service import MealService
 
 
 @pytest.mark.asyncio

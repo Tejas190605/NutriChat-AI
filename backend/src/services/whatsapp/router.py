@@ -1,0 +1,117 @@
+from typing import Any
+
+import structlog
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.services.redis_client import get_redis_client
+from src.services.whatsapp.state_machine import ConversationStateMachine
+from src.services.whatsapp.tasks import (
+    whatsapp_download_media_task,
+    whatsapp_process_incoming_task,
+)
+
+logger = structlog.get_logger()
+
+
+class WhatsAppRouter:
+    """Decodes Meta payloads, checks duplicate locks, and routes requests to workers."""
+
+    def __init__(self, db: AsyncSession) -> None:
+        self.db = db
+        self.redis = get_redis_client()
+
+    async def route_payload(self, body: dict[str, Any]) -> None:
+        """Parses webhook schema models and dispatches jobs.
+
+        Args:
+            body: Raw JSON payload dictionary from Meta.
+        """
+        # 1. Parse Meta Cloud API entry blocks
+        entries = body.get("entry", [])
+        if not entries:
+            return
+
+        for entry in entries:
+            changes = entry.get("changes", [])
+            for change in changes:
+                value = change.get("value", {})
+                messages = value.get("messages", [])
+
+                for msg in messages:
+                    msg_id = msg.get("id")
+                    from_phone = msg.get("from")
+
+                    # 2. Replay protection & message deduplication
+                    if msg_id:
+                        lock_key = f"whatsapp_msg_lock:{msg_id}"
+                        # Try to set Redis key (lock TTL: 5 minutes)
+                        is_new = await self.redis.set(lock_key, "1", ex=300, nx=True)
+                        if not is_new:
+                            logger.info(
+                                "Discarding duplicate WhatsApp webhook message payload",
+                                message_id=msg_id,
+                            )
+                            continue
+
+                    # 3. Detect payload content type
+                    msg_type = msg.get("type")
+
+                    # Onboarding State Machine check
+                    state_machine = ConversationStateMachine(self.db, from_phone)
+                    user = await state_machine.lookup_user()
+
+                    # Retrieve text representation
+                    text_content = ""
+                    if msg_type == "text":
+                        text_content = msg.get("text", {}).get("body", "")
+                    elif msg_type == "interactive":
+                        interactive_type = msg.get("interactive", {}).get("type")
+                        if interactive_type == "button_reply":
+                            text_content = (
+                                msg.get("interactive", {})
+                                .get("button_reply", {})
+                                .get("title", "")
+                            )
+                        elif interactive_type == "list_reply":
+                            text_content = (
+                                msg.get("interactive", {})
+                                .get("list_reply", {})
+                                .get("title", "")
+                            )
+
+                    # Route reset commands immediately
+                    if text_content.strip().lower() == "/reset":
+                        # Dispatch text worker task
+                        whatsapp_process_incoming_task.delay(from_phone, "/reset")
+                        continue
+
+                    # 4. Handle Media/Image intakes
+                    if msg_type == "image":
+                        image_id = msg.get("image", {}).get("id")
+
+                        # Register/retrieve user ID context to link to food image
+                        if user:
+                            user_id_str = str(user.id)
+                        else:
+                            # Start onboarding welcome process and return alert
+                            whatsapp_process_incoming_task.delay(from_phone, "Hi")
+                            continue
+
+                        if image_id:
+                            # Dispatch background media download pipeline Celery worker task
+                            whatsapp_download_media_task.delay(
+                                media_id=image_id,
+                                phone=from_phone,
+                                user_id_str=user_id_str,
+                            )
+                        continue
+
+                    # 5. Route Onboarding state replies or standard chat text
+                    if text_content:
+                        whatsapp_process_incoming_task.delay(from_phone, text_content)
+                    else:
+                        # Log unsupported types (stickers, locations, contacts)
+                        logger.warning(
+                            "Unsupported WhatsApp message format type received",
+                            type=msg_type,
+                        )
