@@ -4,25 +4,33 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard,
+  Home,
   Utensils,
+  Camera,
   BrainCircuit,
+  TrendingUp,
+  Target,
+  User,
+  History,
   LineChart,
-  MessageSquare,
-  ShieldCheck,
   Settings,
+  ShieldCheck,
   Sparkles,
 } from "lucide-react";
 import { clsx } from "clsx";
 
 export const navItems = [
-  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Nutrition & Meals", href: "/dashboard/nutrition", icon: Utensils },
-  { label: "AI Coach & WhatsApp", href: "/dashboard/ai-coach", icon: BrainCircuit },
-  { label: "Analytics & Telemetry", href: "/dashboard/analytics", icon: LineChart },
-  { label: "Conversations Log", href: "/dashboard/conversations", icon: MessageSquare },
-  { label: "Admin Operations", href: "/admin", icon: ShieldCheck, adminOnly: true },
+  { label: "Home Overview", href: "/dashboard/home", icon: Home },
+  { label: "My Profile", href: "/dashboard/profile", icon: User },
+  { label: "Meals & History", href: "/dashboard/meals", icon: Utensils },
+  { label: "AI Meal Analysis", href: "/dashboard/meal-analysis", icon: Camera },
+  { label: "AI Health Coach", href: "/dashboard/ai-coach", icon: BrainCircuit },
+  { label: "Progress & Weight", href: "/dashboard/progress", icon: TrendingUp },
+  { label: "History Timeline", href: "/dashboard/history", icon: History },
+  { label: "My Goal Targets", href: "/dashboard/goals", icon: Target },
+  { label: "Analytics Telemetry", href: "/dashboard/analytics", icon: LineChart },
   { label: "Settings", href: "/dashboard/settings", icon: Settings },
+  { label: "Admin Operations", href: "/admin", icon: ShieldCheck, adminOnly: true },
 ];
 
 export const Sidebar: React.FC = () => {
@@ -38,22 +46,24 @@ export const Sidebar: React.FC = () => {
           </div>
           <div>
             <h1 className="text-base font-bold tracking-tight text-white">NutriChat AI</h1>
-            <p className="text-[10px] font-medium text-emerald-400 uppercase tracking-widest">Autonomous Agent</p>
+            <p className="text-[10px] font-medium text-emerald-400 uppercase tracking-widest">Autonomous Health Coach</p>
           </div>
         </div>
 
         {/* Navigation Links */}
-        <nav className="p-4 space-y-1.5">
+        <nav className="p-4 space-y-1 overflow-y-auto max-h-[calc(100vh-120px)]">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+            const isActive =
+              pathname === item.href ||
+              (item.href === "/dashboard/home" && pathname === "/dashboard");
 
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 className={clsx(
-                  "flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200",
+                  "flex items-center gap-3 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all duration-200",
                   isActive
                     ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 shadow-sm"
                     : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/60"
@@ -70,7 +80,7 @@ export const Sidebar: React.FC = () => {
       {/* Footer Info */}
       <div className="p-4 border-t border-slate-800/80 text-[11px] text-slate-500">
         <div className="flex items-center justify-between">
-          <span>Engine v0.1.9</span>
+          <span>Engine v0.2.0</span>
           <span className="inline-flex items-center gap-1 text-emerald-400 font-medium">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" /> Online
           </span>

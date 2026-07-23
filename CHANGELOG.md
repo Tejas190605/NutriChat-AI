@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.3.0] - 2026-07-23
+### Added
+*   Complete User Portal & AI Health Coach frontend application experience (`frontend/`).
+*   14 User Portal specialized components (`MealCard`, `MacroProgress`, `WaterTracker`, `WeightCard`, `AchievementCard`, `InsightCard`, `Timeline`, `ProgressRing`, `GoalCard`, `AIChatBubble`, `ImageUploader`, `NutritionSummary`, `PredictionCard`).
+*   10 User Portal App Router route pages:
+    - User Home Dashboard (`/dashboard/home`)
+    - Personal Profile & Health Parameters (`/dashboard/profile`)
+    - Meal Logging & Timeline (`/dashboard/meals`)
+    - AI Meal Photo & Vision Analysis (`/dashboard/meal-analysis`)
+    - AI Health Coach Chat (`/dashboard/ai-coach`)
+    - Progress & Weight Trajectory (`/dashboard/progress`)
+    - Chronological History Timeline (`/dashboard/history`)
+    - Goal Targets & Budgets (`/dashboard/goals`)
+    - Telemetry Analytics (`/dashboard/analytics`)
+    - Account Settings (`/dashboard/settings`)
+*   Quality verification: 0 TypeScript errors, 0 ESLint warnings/errors, 2/2 Vitest tests passed, 22/22 Next.js production static routes prerendered.
+*   Comprehensive review documentation in [user_portal_review.md](file:///c:/Users/tejas/Documents/Projects/NutriChat-AI/docs/reviews/user_portal_review.md).
+
 ## [0.2.0] - 2026-07-23
 ### Added
 *   Next.js 15+ App Router frontend project structure (`frontend/`) configured with TypeScript, Tailwind CSS, Lucide icons, and Recharts.

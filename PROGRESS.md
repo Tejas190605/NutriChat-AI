@@ -80,9 +80,12 @@ This document tracks the current status and metrics of the NutriChat AI project.
 *   [x] Build 9 Admin Dashboard Feature Modules (`/dashboard`, `/dashboard/users`, `/dashboard/nutrition`, `/dashboard/meals`, `/dashboard/analytics`, `/dashboard/ai`, `/dashboard/vision`, `/dashboard/whatsapp`, `/dashboard/settings`)
 *   [x] Create reusable `DataTable` (search, sorting, pagination, filtering, CSV export) and `CalorieTrendChart`, `MacroBreakdownChart`, `WeightPredictionChart`, `TelemetryMetricsChart`
 *   [x] Verify TypeScript (0 errors), ESLint (0 warnings/errors), Vitest (2/2 passed), and Next.js production build (15/15 prerendered static routes)
+*   [x] Build 14 User Portal specialized components (`MealCard`, `MacroProgress`, `WaterTracker`, `WeightCard`, `AchievementCard`, `InsightCard`, `Timeline`, `ProgressRing`, `GoalCard`, `AIChatBubble`, `ImageUploader`, `NutritionSummary`, `PredictionCard`)
+*   [x] Build 10 User Portal App Router pages (`/home`, `/profile`, `/meals`, `/meal-analysis`, `/ai-coach`, `/progress`, `/history`, `/goals`, `/analytics`, `/settings`)
+*   [x] Verify TypeScript (0 errors), ESLint (0 warnings/errors), Vitest (2/2 passed), and Next.js production build (22/22 prerendered static routes)
 
 ### Features In Progress
-*   *Phase 6B completed successfully.*
+*   *Phase 6C User Portal & AI Health Coach completed successfully.*
 
 ### Upcoming Tasks
 *   [ ] Integration testing with live backend PostgreSQL & Redis database containers.
