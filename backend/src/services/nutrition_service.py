@@ -1,3 +1,4 @@
+from typing import Any
 from uuid import UUID
 
 import structlog
@@ -13,23 +14,33 @@ from src.repositories.nutrition import (
     FoodRepository,
     RecentFoodRepository,
 )
+from src.services.nutrition.gemini_nutrition import GeminiNutritionEngine
 
 logger = structlog.get_logger()
 
 
 class NutritionService:
-    """Service orchestrating food lookups, favorites preferences, and barcode lookups."""
+    """Service orchestrating food lookups, Gemini AI nutrition estimates, favorites, and barcode lookups."""
 
-    def __init__(self, db: AsyncSession):
+    def __init__(
+        self,
+        db: AsyncSession,
+        nutrition_engine: GeminiNutritionEngine | None = None,
+    ):
         self.db = db
         self.food_repo = FoodRepository(db)
         self.barcode_repo = BarcodeRepository(db)
         self.favorite_repo = FavoriteFoodRepository(db)
         self.recent_repo = RecentFoodRepository(db)
+        self.nutrition_engine = nutrition_engine or GeminiNutritionEngine()
 
     async def lookup_food(self, query: str, limit: int = 20) -> list[Food]:
         """Queries foods by name containing search string, preloading nutrition facts."""
         return await self.food_repo.search_by_name(query, limit)
+
+    async def estimate_food_nutrition(self, query: str) -> dict[str, Any]:
+        """Estimates complete nutrition details for any food query using Gemini AI."""
+        return await self.nutrition_engine.estimate_nutrition(food_query=query)
 
     async def lookup_barcode(self, barcode: str) -> BarcodeProduct | None:
         """Finds barcode catalog entries matching scanned numbers."""

@@ -57,10 +57,6 @@ services:
         generateValue: true
       - key: GEMINI_API_KEY
         sync: false
-      - key: EDAMAM_APP_ID
-        sync: false
-      - key: EDAMAM_APP_KEY
-        sync: false
       - key: CLOUDINARY_URL
         sync: false
       - key: FACEBOOK_APP_SECRET

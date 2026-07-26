@@ -9,25 +9,30 @@ from src.repositories.ai import (
     OCRResultRepository,
     VisionPredictionRepository,
 )
+from src.services.nutrition.gemini_nutrition import GeminiNutritionEngine
 from src.services.vision.pipeline import VisionOCRPipeline
 
 logger = structlog.get_logger()
 
 
 class MealAnalyzer:
-    """Analyzes uploads and combines predictions and OCR results into structured macronutrient details."""
+    """Analyzes uploads and combines predictions and OCR results into structured macronutrient details using Gemini AI."""
 
     def __init__(
-        self, db: AsyncSession, pipeline: VisionOCRPipeline | None = None
+        self,
+        db: AsyncSession,
+        pipeline: VisionOCRPipeline | None = None,
+        nutrition_engine: GeminiNutritionEngine | None = None,
     ) -> None:
         self.db = db
         self.pipeline = pipeline or VisionOCRPipeline()
+        self.nutrition_engine = nutrition_engine or GeminiNutritionEngine()
         self.image_repo = FoodImageRepository(db)
         self.ocr_repo = OCRResultRepository(db)
         self.pred_repo = VisionPredictionRepository(db)
 
     async def analyze_meal_image(self, image_id: UUID) -> dict[str, Any]:
-        """Runs computer vision pipelines and aggregates macronutrients and calories calculations.
+        """Runs computer vision pipelines and aggregates macronutrients and calories calculations via Gemini AI.
 
         Args:
             image_id: String UUID identifier of the FoodImage.
@@ -40,96 +45,76 @@ class MealAnalyzer:
             raise ValueError(f"Food image not found: {image_id}")
 
         logger.info(
-            "Analyzing meal image details", image_id=str(image_id), url=image.image_url
+            "Analyzing meal image details via Gemini AI",
+            image_id=str(image_id),
+            url=image.image_url,
         )
 
         # 1. Fetch Detections
         detected_foods = await self.pipeline.detect_food(image.image_url)
 
-        # 2. Estimate Portions & collect predictions details
-        aggregated_foods = []
-        total_calories = 0
-        total_protein = 0.0
-        total_carbs = 0.0
-        total_fat = 0.0
-        confidence_sum = 0.0
+        # 2. Extract OCR raw nutrition data
+        raw_ocr_text = await self.pipeline.read_text(image.image_url)
+        parsed_ocr_json = await self.pipeline.parse_nutrition_label(image.image_url)
 
-        for item in detected_foods:
-            label = item["label"]
-            confidence = item["confidence"]
-            confidence_sum += confidence
+        vision_ocr_data = {
+            "detected_foods": [f.get("label") for f in detected_foods],
+            "raw_ocr_text": raw_ocr_text,
+            "parsed_ocr": parsed_ocr_json,
+        }
 
-            portion = await self.pipeline.estimate_portion(image.image_url, label)
-
-            # Estimate default macros based on food label names (mock reasoning rules)
-            weight = portion.get("weight_grams", 100.0)
-            factor = weight / 100.0
-
-            # Dynamic mock macronutrients calculations matching standard ingredients
-            if "apple" in label.lower():
-                cals = int(52 * factor)
-                prot = 0.3 * factor
-                carbs = 14.0 * factor
-                fat = 0.2 * factor
-            elif "salad" in label.lower():
-                cals = int(40 * factor)
-                prot = 2.0 * factor
-                carbs = 8.0 * factor
-                fat = 0.5 * factor
-            else:  # general Indian food defaults (e.g. paneer roti)
-                cals = int(180 * factor)
-                prot = 8.0 * factor
-                carbs = 25.0 * factor
-                fat = 6.0 * factor
-
-            total_calories += cals
-            total_protein += prot
-            total_carbs += carbs
-            total_fat += fat
-
-            aggregated_foods.append(
-                {
-                    "label": label,
-                    "confidence": confidence,
-                    "portion": f"{portion.get('quantity', 1.0)} {portion.get('unit', 'serving')}",
-                    "weight_grams": weight,
-                    "calories": cals,
-                }
-            )
-
-        # 3. Check OCR nutritional panel facts fallback
-        parsed_label_macros = await self.pipeline.parse_nutrition_label(image.image_url)
-        if parsed_label_macros and len(detected_foods) == 0:
-            # Fallback to OCR parsed values directly if no foods were detected visually
-            total_calories = parsed_label_macros.get("calories", 0)
-            total_protein = parsed_label_macros.get("protein", 0.0)
-            total_carbs = parsed_label_macros.get("carbs", 0.0)
-            total_fat = parsed_label_macros.get("fat", 0.0)
-            confidence_sum = 0.95
-            aggregated_foods.append(
-                {
-                    "label": "Packaged Product Label",
-                    "confidence": 0.95,
-                    "portion": "1 pack",
-                    "weight_grams": 100.0,
-                    "calories": total_calories,
-                }
-            )
-
-        avg_confidence = (
-            confidence_sum / len(detected_foods) if detected_foods else 0.95
+        # 3. Perform AI Nutrition estimation with Gemini Nutrition Engine
+        food_query_name = ", ".join([f["label"] for f in detected_foods]) if detected_foods else "Uploaded Meal"
+        nutrition_estimate = await self.nutrition_engine.estimate_nutrition(
+            food_query=food_query_name,
+            image_url_or_bytes=image.image_url,
+            vision_ocr_data=vision_ocr_data,
         )
+
+        # Build aggregated foods list
+        aggregated_foods = []
+        if detected_foods:
+            for item in detected_foods:
+                label = item["label"]
+                confidence = item["confidence"]
+                portion = await self.pipeline.estimate_portion(image.image_url, label)
+
+                aggregated_foods.append(
+                    {
+                        "label": label,
+                        "confidence": confidence,
+                        "portion": f"{portion.get('quantity', 1.0)} {portion.get('unit', 'serving')}",
+                        "weight_grams": portion.get("weight_grams", 150.0),
+                        "calories": int(nutrition_estimate["estimated_calories"] / max(len(detected_foods), 1)),
+                    }
+                )
+        else:
+            aggregated_foods.append(
+                {
+                    "label": nutrition_estimate["food_name"],
+                    "confidence": nutrition_estimate["confidence"],
+                    "portion": nutrition_estimate["serving_size"],
+                    "weight_grams": 200.0,
+                    "calories": nutrition_estimate["estimated_calories"],
+                }
+            )
 
         analysis_result = {
             "foods": aggregated_foods,
-            "total_calories": total_calories,
-            "total_protein": round(total_protein, 1),
-            "total_carbs": round(total_carbs, 1),
-            "total_fat": round(total_fat, 1),
-            "confidence_score": round(avg_confidence, 2),
+            "total_calories": nutrition_estimate["estimated_calories"],
+            "total_protein": nutrition_estimate["protein_g"],
+            "total_carbs": nutrition_estimate["carbs_g"],
+            "total_fat": nutrition_estimate["fat_g"],
+            "fiber_g": nutrition_estimate["fiber_g"],
+            "sugar_g": nutrition_estimate["sugar_g"],
+            "sodium_mg": nutrition_estimate["sodium_mg"],
+            "confidence_score": nutrition_estimate["confidence"],
+            "reasoning": nutrition_estimate["reasoning"],
         }
 
         logger.info(
-            "Meal analysis compiled", image_id=str(image_id), result=analysis_result
+            "Meal analysis compiled with Gemini Nutrition Engine",
+            image_id=str(image_id),
+            result=analysis_result,
         )
         return analysis_result

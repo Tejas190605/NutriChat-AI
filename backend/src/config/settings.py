@@ -43,10 +43,8 @@ class Settings(BaseSettings):
     WHATSAPP_PHONE_NUMBER_ID: str = Field(default="dev_phone_number_id")
     WHATSAPP_ACCESS_TOKEN: str = Field(default="dev_whatsapp_access_token")
 
-    # AI & Macros APIs
+    # AI & Media Storage APIs
     GEMINI_API_KEY: str = Field(default="dev_gemini_key")
-    EDAMAM_APP_ID: str = Field(default="dev_edamam_id")
-    EDAMAM_APP_KEY: str = Field(default="dev_edamam_key")
     CLOUDINARY_URL: str = Field(default="cloudinary://dev_key:dev_secret@dev_cloud")
 
     @model_validator(mode="after")

@@ -31,7 +31,7 @@ graph TD
     end
 
     SQLAlchemy -->|Read/Write| PostgreSQL[(PostgreSQL Database)]
-    VisionEngine -->|Fetch External Macros| Edamam[Edamam & Open Food API]
+    VisionEngine -->|Estimate Macros| GeminiNutrition[Gemini AI Nutrition Engine]
     NextJS[NextJS Admin Dashboard] -->|API Requests| FastAPI
 ```
 
@@ -49,7 +49,7 @@ sequenceDiagram
     participant Webhook as FastAPI Webhook
     participant DB as PostgreSQL
     participant AI as Vision/LLM Engine
-    participant Nutrition as Edamam API
+    participant Nutrition as Gemini AI Nutrition Engine
 
     User->>Meta: Sends Food Photo (Pizza)
     Meta->>Webhook: Webhook Payload (HTTP POST with X-Hub-Signature-256)

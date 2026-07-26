@@ -9,9 +9,9 @@ NutriChat AI is an end-to-end HealthTech platform designed to serve as a persona
 *   **Multimodal Log Intake**: Accepts food photos, voice notes, text messages, restaurant menus, barcode scans, and nutrition labels.
 *   **Indian Food Optimization**: Vision AI tuned for mixed Indian plate dishes (e.g. dal, paneer, papad, roti, rice) and street foods.
 *   **Portion Size Estimation**: Converts bounding shapes and food types into approximate weights (grams) and counts.
-*   **Detailed Nutrition Breakdown**: Fetches verified calorie, macro, and micro metrics via Edamam and Open Food Facts APIs.
+*   **Zero-Cost Gemini AI Nutrition Engine**: Calculates verified calorie, macro, and micro metrics using Google Gemini AI without paid third-party API dependencies.
 *   **Interactive AI Coaching**: Retains conversational memory for answering user queries based on profile targets.
-*   **Admin Dashboard Web Portal**: Real-time analytical dashboard built with React + Next.js for tracking user activity, API usage, and system health.
+*   **Admin Dashboard Web Portal**: Real-time analytical dashboard built with React + Next.js for tracking user activity and system health.
 
 ---
 
@@ -22,9 +22,10 @@ NutriChat AI is an end-to-end HealthTech platform designed to serve as a persona
 | **Frontend (Dashboard)** | React, Next.js, Tailwind CSS |
 | **Backend API** | Python FastAPI, Uvicorn |
 | **Database** | PostgreSQL |
-| **Cache & Queue** | Redis |
-| **AI Processing** | Gemini 2.5 / GPT-4 Vision / Claude |
-| **Third-Party Integrations** | WhatsApp Cloud API, Edamam Nutrition API, Open Food Facts |
+| **Cache & Key-Value** | Redis / Valkey |
+| **AI Processing** | Google Gemini AI (Gemini 1.5 Flash) |
+| **Nutrition Engine** | Zero-Cost Gemini AI Nutrition Engine |
+| **Integrations** | WhatsApp Cloud API, Open Food Facts |
 | **Containerization** | Docker, Docker Compose |
 
 ---
@@ -53,21 +54,21 @@ Below is a block level representation of the NutriChat AI data flows:
             v                     v                     v
     +---------------+     +---------------+     +---------------+
     |  PostgreSQL   |     |     Redis     |     |   Cloudinary  |
-    | (Users, Meals)|     | (Cache, Rate) |     |  (Image Store)|
+    | (Users, Meals)|     | (Cache, Locks)|     |  (Image Store)|
     +---------------+     +---------------+     +---------------+
             |                     |                     |
             +---------------------+---------------------+
                                   |
                                   v
                   +--------------------------------+
-                  |       AI Pipeline Logic        |
-                  | (Vision AI, OCR, Gemini/GPT)   |
+                  |    AI Pipeline Logic           |
+                  | (Vision AI, OCR, Gemini 1.5)   |
                   +---------------+----------------+
                                   |
                                   v
                   +--------------------------------+
-                  |       External Services        |
-                  |    (Edamam API, Open Food)     |
+                  |    Gemini AI Nutrition Engine  |
+                  | (Zero-Cost Macro Calculations) |
                   +--------------------------------+
 ```
 
@@ -82,7 +83,7 @@ NutriChat-AI/
 │   ├── database/       # SQLAlchemy configurations and migrations
 │   ├── models/         # Database models and Pydantic schemas
 │   ├── routes/         # API routers (auth, logs, webhooks)
-│   ├── services/       # Edamam, Open Food Facts, WhatsApp wrappers
+│   ├── services/       # Gemini AI Nutrition Engine, Open Food Facts, WhatsApp wrappers
 │   └── utils/          # Security, auth, caching helper files
 ├── frontend/           # Next.js web application for the admin dashboard
 ├── docker/             # Docker configuration files
