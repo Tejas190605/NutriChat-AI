@@ -1,34 +1,20 @@
-from celery import Celery
+"""Celery Application Compatibility Module.
 
-from src.config.settings import settings
+Note: NutriChat AI is optimized for 100% Render Free deployment using direct asynchronous request execution.
+Celery worker dependencies are disabled in this tier.
+"""
 
-# Initialize Celery Application
-celery_app = Celery(
-    "nutrichat_tasks",
-    broker=settings.CELERY_BROKER_URL,
-    backend=settings.CELERY_RESULT_BACKEND,
-)
-
-# Standard queue settings
-celery_app.conf.update(
-    task_serializer="json",
-    accept_content=["json"],
-    result_serializer="json",
-    timezone="Asia/Kolkata",
-    enable_utc=True,
-    task_track_started=True,
-)
+from typing import Any, Callable
 
 
-@celery_app.task(name="src.services.celery_app.test_celery_task")  # type: ignore[untyped-decorator]
-def test_celery_task(x: int, y: int) -> int:
-    """A baseline diagnostic Celery task that performs additions.
+class DummyCeleryApp:
+    """Lightweight stub replacing Celery app instance in synchronous Free Tier mode."""
 
-    Args:
-        x: An integer input.
-        y: Another integer input.
+    def task(self, *args: Any, **kwargs: Any) -> Callable[[Callable[..., Any]], Callable[..., Any]]:
+        def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
+            return func
 
-    Returns:
-        The sum of x and y.
-    """
-    return x + y
+        return decorator
+
+
+celery_app = DummyCeleryApp()

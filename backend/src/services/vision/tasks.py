@@ -1,144 +1,128 @@
-import asyncio
 from typing import Any
 from uuid import UUID
 
 import structlog
-from celery.utils.log import get_task_logger
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.db.session import AsyncSessionLocal
 from src.repositories.ai import (
     FoodImageRepository,
     OCRResultRepository,
     VisionPredictionRepository,
 )
-from src.services.celery_app import celery_app
 from src.services.vision.pipeline import VisionOCRPipeline
 
-# Celery logger wrapper
-logger = get_task_logger(__name__)
-struct_logger = structlog.get_logger()
+logger = structlog.get_logger()
 
 
-async def async_process_food_image(task_obj: Any, image_id: str) -> dict[str, Any]:
-    """Asynchronously processes a food image: detects foods, estimates portions, and runs OCR scans.
+async def process_food_image(db: AsyncSession, image_id: UUID) -> dict[str, Any]:
+    """Synchronously/Directly processes a food image within the FastAPI request cycle.
+
+    Detects foods, estimates portions, and runs OCR scans without background worker queues.
 
     Args:
-        task_obj: The Celery task instance (for retries).
-        image_id: String UUID identifier of the FoodImage record.
+        db: Active SQLAlchemy AsyncSession.
+        image_id: UUID identifier of the FoodImage record.
 
     Returns:
         A dict containing execution results statistics.
     """
-    image_uuid = UUID(image_id)
+    image_repo = FoodImageRepository(db)
+    ocr_repo = OCRResultRepository(db)
+    pred_repo = VisionPredictionRepository(db)
 
-    async with AsyncSessionLocal() as db:
-        image_repo = FoodImageRepository(db)
-        ocr_repo = OCRResultRepository(db)
-        pred_repo = VisionPredictionRepository(db)
+    # 1. Fetch image
+    image = await image_repo.get(image_id)
+    if not image or image.deleted_at:
+        logger.error(
+            "Food image record not found for processing",
+            image_id=str(image_id),
+        )
+        return {"status": "error", "message": "Food image not found"}
 
-        # 1. Fetch image
-        image = await image_repo.get(image_uuid)
-        if not image or image.deleted_at:
-            struct_logger.error(
-                "Food image record not found for background processing",
-                image_id=image_id,
+    # 2. Update status to processing
+    image.status = "processing"
+    db.add(image)
+    await db.commit()
+
+    try:
+        pipeline = VisionOCRPipeline()
+
+        # 3. Detect food items
+        detected_foods = await pipeline.detect_food(image.image_url)
+
+        # 4. For each food item, run portion estimation and persist prediction
+        predictions = []
+        for item in detected_foods:
+            label = item["label"]
+            confidence = item["confidence"]
+            coords = item.get("box_coordinates")
+
+            # Portion estimation
+            portion = await pipeline.estimate_portion(image.image_url, label)
+
+            # Combine coordinate details and portion sizes
+            payload = {
+                "box_coordinates": coords,
+                "portion_estimation": portion,
+            }
+
+            pred = await pred_repo.create(
+                {
+                    "food_image_id": image.id,
+                    "label": label,
+                    "confidence": confidence,
+                    "box_coordinates": payload,
+                }
             )
-            return {"status": "error", "message": "Food image not found"}
+            predictions.append(pred.label)
 
-        # 2. Update status to processing
-        image.status = "processing"
+        # 5. Extract OCR raw nutrition data
+        raw_text = await pipeline.read_text(image.image_url)
+        parsed_json = await pipeline.parse_nutrition_label(image.image_url)
+
+        await ocr_repo.create(
+            {
+                "food_image_id": image.id,
+                "raw_text": raw_text,
+                "parsed_json": parsed_json,
+            }
+        )
+
+        # 6. Mark image processing completed
+        image.status = "completed"
         db.add(image)
         await db.commit()
 
-        try:
-            pipeline = VisionOCRPipeline()
+        logger.info(
+            "Food image processing complete",
+            image_id=str(image_id),
+            detected=predictions,
+        )
 
-            # 3. Detect food items in background
-            detected_foods = await pipeline.detect_food(image.image_url)
+        return {
+            "status": "success",
+            "image_id": str(image_id),
+            "predictions_count": len(predictions),
+            "predictions": predictions,
+        }
 
-            # 4. For each food item, run portion estimation and persist prediction
-            predictions = []
-            for item in detected_foods:
-                label = item["label"]
-                confidence = item["confidence"]
-                coords = item.get("box_coordinates")
-
-                # Portion estimation
-                portion = await pipeline.estimate_portion(image.image_url, label)
-
-                # Combine coordinate details and portion sizes
-                payload = {
-                    "box_coordinates": coords,
-                    "portion_estimation": portion,
-                }
-
-                pred = await pred_repo.create(
-                    {
-                        "food_image_id": image.id,
-                        "label": label,
-                        "confidence": confidence,
-                        "box_coordinates": payload,
-                    }
-                )
-                predictions.append(pred.label)
-
-            # 5. Extract OCR raw nutrition data
-            raw_text = await pipeline.read_text(image.image_url)
-            parsed_json = await pipeline.parse_nutrition_label(image.image_url)
-
-            await ocr_repo.create(
-                {
-                    "food_image_id": image.id,
-                    "raw_text": raw_text,
-                    "parsed_json": parsed_json,
-                }
-            )
-
-            # 6. Mark image processing completed
-            image.status = "completed"
-            db.add(image)
-            await db.commit()
-
-            struct_logger.info(
-                "Food image background processing complete",
-                image_id=image_id,
-                detected=predictions,
-            )
-
-            return {
-                "status": "success",
-                "image_id": image_id,
-                "predictions_count": len(predictions),
-                "predictions": predictions,
-            }
-
-        except Exception as e:
-            await db.rollback()
-            struct_logger.error(
-                "Error processing food image task, retrying...",
-                image_id=image_id,
-                error=str(e),
-            )
-            # Trigger Celery retry mechanism
-            try:
-                raise task_obj.retry(exc=e)
-            except Exception as retry_exc:
-                # If retry count is exhausted, mark task as failed
-                image.status = "failed"
-                db.add(image)
-                await db.commit()
-                raise retry_exc
+    except Exception as e:
+        await db.rollback()
+        image.status = "failed"
+        db.add(image)
+        await db.commit()
+        logger.error(
+            "Error processing food image",
+            image_id=str(image_id),
+            error=str(e),
+        )
+        raise e
 
 
-# Run task loop using asyncio event loop wrapper
+# Backward compatibility wrapper for existing tests
+async def async_process_food_image(task_obj: Any, image_id: str) -> dict[str, Any]:
+    """Compatibility wrapper for direct test invocations."""
+    from src.db.session import AsyncSessionLocal
 
-
-@celery_app.task(
-    name="src.services.vision.tasks.process_food_image_task",
-    bind=True,
-    max_retries=3,
-    default_retry_delay=10,
-)  # type: ignore[untyped-decorator]
-def process_food_image_task(self: Any, image_id: str) -> dict[str, Any]:
-    """Background task wrapper running the async food image processing loop."""
-    return asyncio.run(async_process_food_image(self, image_id))
+    async with AsyncSessionLocal() as session:
+        return await process_food_image(session, UUID(image_id))

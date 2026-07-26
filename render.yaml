@@ -8,7 +8,7 @@ services:
     persistenceMode: off
     ipAllowList: []
 
-  # FastAPI Backend Web Service
+  # FastAPI Backend Web Service (100% Free Tier - Direct Async Processing)
   - type: web
     name: nutrichat-backend
     runtime: python
@@ -27,7 +27,7 @@ services:
         fromService:
           type: web
           name: nutrichat-frontend
-          property: host
+          envVarKey: RENDER_EXTERNAL_URL
       - key: POSTGRES_USER
         fromDatabase:
           name: nutrichat-db
@@ -49,93 +49,12 @@ services:
           name: nutrichat-db
           property: database
       - key: REDIS_URL
-        fromService:
-          type: keyvalue
-          name: nutrichat-redis
-          property: connectionString
-      - key: CELERY_BROKER_URL
-        fromService:
-          type: keyvalue
-          name: nutrichat-redis
-          property: connectionString
-      - key: CELERY_RESULT_BACKEND
         fromService:
           type: keyvalue
           name: nutrichat-redis
           property: connectionString
       - key: JWT_SECRET
         generateValue: true
-      - key: GEMINI_API_KEY
-        sync: false
-      - key: EDAMAM_APP_ID
-        sync: false
-      - key: EDAMAM_APP_KEY
-        sync: false
-      - key: CLOUDINARY_URL
-        sync: false
-      - key: FACEBOOK_APP_SECRET
-        sync: false
-      - key: FACEBOOK_VERIFY_TOKEN
-        sync: false
-      - key: WHATSAPP_PHONE_NUMBER_ID
-        sync: false
-      - key: WHATSAPP_ACCESS_TOKEN
-        sync: false
-
-  # Celery Background Task Worker
-  - type: worker
-    name: nutrichat-worker
-    runtime: python
-    region: singapore
-    plan: starter
-    rootDir: backend
-    buildCommand: pip install poetry && poetry config virtualenvs.create false && poetry install --only main
-    startCommand: poetry run celery -A src.services.celery_app.celery_app worker --loglevel=info
-    envVars:
-      - key: ENV
-        value: production
-      - key: DEBUG
-        value: "false"
-      - key: POSTGRES_USER
-        fromDatabase:
-          name: nutrichat-db
-          property: user
-      - key: POSTGRES_PASSWORD
-        fromDatabase:
-          name: nutrichat-db
-          property: password
-      - key: POSTGRES_HOST
-        fromDatabase:
-          name: nutrichat-db
-          property: host
-      - key: POSTGRES_PORT
-        fromDatabase:
-          name: nutrichat-db
-          property: port
-      - key: POSTGRES_DB
-        fromDatabase:
-          name: nutrichat-db
-          property: database
-      - key: REDIS_URL
-        fromService:
-          type: keyvalue
-          name: nutrichat-redis
-          property: connectionString
-      - key: CELERY_BROKER_URL
-        fromService:
-          type: keyvalue
-          name: nutrichat-redis
-          property: connectionString
-      - key: CELERY_RESULT_BACKEND
-        fromService:
-          type: keyvalue
-          name: nutrichat-redis
-          property: connectionString
-      - key: JWT_SECRET
-        fromService:
-          type: web
-          name: nutrichat-backend
-          envVarKey: JWT_SECRET
       - key: GEMINI_API_KEY
         sync: false
       - key: EDAMAM_APP_ID
@@ -170,7 +89,7 @@ services:
         fromService:
           type: web
           name: nutrichat-backend
-          property: host
+          envVarKey: RENDER_EXTERNAL_URL
 
 databases:
   - name: nutrichat-db

@@ -3,7 +3,9 @@ from src.services.vision.interfaces import OCRProvider, StorageProvider, VisionP
 from src.services.vision.mock_providers import MockOCRProvider, MockVisionProvider
 from src.services.vision.pipeline import ImageUploadPipeline, VisionOCRPipeline
 from src.services.vision.preprocessing import preprocess_image
-from src.services.vision.tasks import process_food_image_task
+from src.services.vision.tasks import process_food_image
+
+process_food_image_task = process_food_image
 
 __all__ = [
     "StorageProvider",
@@ -15,5 +17,6 @@ __all__ = [
     "preprocess_image",
     "ImageUploadPipeline",
     "VisionOCRPipeline",
+    "process_food_image",
     "process_food_image_task",
 ]

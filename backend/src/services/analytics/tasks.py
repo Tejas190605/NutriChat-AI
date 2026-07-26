@@ -1,62 +1,46 @@
-import asyncio
 from datetime import date, timedelta
+from uuid import UUID
 
 import structlog
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.db.session import AsyncSessionLocal
 from src.models.user import User
 from src.services.analytics.analytics_engine import AnalyticsEngine
-from src.services.celery_app import celery_app
 
 logger = structlog.get_logger()
 
 
-@celery_app.task(
-    name="src.services.analytics.tasks.daily_summaries_generation_task"
-)  # type: ignore[untyped-decorator]
-def daily_summaries_generation_task() -> None:
-    """Cron-triggered task to aggregate daily summaries for all active users."""
-    logger.info("Executing Celery daily summaries calculation task")
+async def generate_daily_summaries(db: AsyncSession) -> None:
+    """Aggregates daily summaries for all active users directly."""
+    logger.info("Executing daily summaries calculation process")
 
-    async def _process() -> None:
-        async with AsyncSessionLocal() as session:
-            # Fetch all user IDs
-            stmt = select(User.id)
-            res = await session.execute(stmt)
-            user_ids = res.scalars().all()
+    stmt = select(User.id)
+    res = await db.execute(stmt)
+    user_ids = res.scalars().all()
 
-            engine = AnalyticsEngine(session)
-            target_date = date.today() - timedelta(days=1)  # Process yesterday's logs
+    engine = AnalyticsEngine(db)
+    target_date = date.today() - timedelta(days=1)
 
-            for uid in user_ids:
-                try:
-                    await engine.calculate_daily_nutrition_summary(uid, target_date)
-                    logger.info(
-                        "Processed daily nutrition summary",
-                        user_id=str(uid),
-                        date=target_date.isoformat(),
-                    )
-                except Exception as e:
-                    logger.error(
-                        "Failed to calculate daily summaries",
-                        user_id=str(uid),
-                        error=str(e),
-                    )
+    for uid in user_ids:
+        try:
+            await engine.calculate_daily_nutrition_summary(uid, target_date)
+            logger.info(
+                "Processed daily nutrition summary",
+                user_id=str(uid),
+                date=target_date.isoformat(),
+            )
+        except Exception as e:
+            logger.error(
+                "Failed to calculate daily summary",
+                user_id=str(uid),
+                error=str(e),
+            )
 
-            await session.commit()
-
-    loop = asyncio.get_event_loop()
-    if loop.is_running():
-        asyncio.ensure_future(_process())
-    else:
-        loop.run_until_complete(_process())
+    await db.commit()
 
 
-@celery_app.task(
-    name="src.services.analytics.tasks.achievement_calculation_task"
-)  # type: ignore[untyped-decorator]
-def achievement_calculation_task(user_id_str: str) -> None:
-    """Asynchronous task triggered to check and unlock achievements badges for a user."""
-    logger.info("Executing Celery achievement calculation task", user_id=user_id_str)
-    # Mock behavior for achievement check checks
+async def calculate_user_achievements(db: AsyncSession, user_id: UUID) -> None:
+    """Checks and unlocks achievement badges for a user synchronously."""
+    logger.info("Executing user achievement calculation", user_id=str(user_id))
+    # Achievement check logic execution

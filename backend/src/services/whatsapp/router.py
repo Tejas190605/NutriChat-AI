@@ -6,22 +6,22 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.services.redis_client import get_redis_client
 from src.services.whatsapp.state_machine import ConversationStateMachine
 from src.services.whatsapp.tasks import (
-    whatsapp_download_media_task,
-    whatsapp_process_incoming_task,
+    download_and_process_whatsapp_media,
+    process_incoming_whatsapp_message,
 )
 
 logger = structlog.get_logger()
 
 
 class WhatsAppRouter:
-    """Decodes Meta payloads, checks duplicate locks, and routes requests to workers."""
+    """Decodes Meta payloads, checks duplicate locks, and routes requests synchronously."""
 
     def __init__(self, db: AsyncSession) -> None:
         self.db = db
         self.redis = get_redis_client()
 
     async def route_payload(self, body: dict[str, Any]) -> None:
-        """Parses webhook schema models and dispatches jobs.
+        """Parses webhook schema models and dispatches jobs directly.
 
         Args:
             body: Raw JSON payload dictionary from Meta.
@@ -81,8 +81,9 @@ class WhatsAppRouter:
 
                     # Route reset commands immediately
                     if text_content.strip().lower() == "/reset":
-                        # Dispatch text worker task
-                        whatsapp_process_incoming_task.delay(from_phone, "/reset")
+                        await process_incoming_whatsapp_message(
+                            self.db, from_phone, "/reset"
+                        )
                         continue
 
                     # 4. Handle Media/Image intakes
@@ -91,26 +92,30 @@ class WhatsAppRouter:
 
                         # Register/retrieve user ID context to link to food image
                         if user:
-                            user_id_str = str(user.id)
+                            user_id = user.id
                         else:
                             # Start onboarding welcome process and return alert
-                            whatsapp_process_incoming_task.delay(from_phone, "Hi")
+                            await process_incoming_whatsapp_message(
+                                self.db, from_phone, "Hi"
+                            )
                             continue
 
                         if image_id:
-                            # Dispatch background media download pipeline Celery worker task
-                            whatsapp_download_media_task.delay(
+                            # Execute media download pipeline synchronously
+                            await download_and_process_whatsapp_media(
+                                db=self.db,
                                 media_id=image_id,
                                 phone=from_phone,
-                                user_id_str=user_id_str,
+                                user_id=user_id,
                             )
                         continue
 
                     # 5. Route Onboarding state replies or standard chat text
                     if text_content:
-                        whatsapp_process_incoming_task.delay(from_phone, text_content)
+                        await process_incoming_whatsapp_message(
+                            self.db, from_phone, text_content
+                        )
                     else:
-                        # Log unsupported types (stickers, locations, contacts)
                         logger.warning(
                             "Unsupported WhatsApp message format type received",
                             type=msg_type,
