@@ -3,9 +3,10 @@ name = "nutrichat-backend"
 version = "0.1.0"
 description = "FastAPI Backend for NutriChat AI"
 authors = ["Antigravity Developer <developer@nutrichat.ai>"]
+package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.11,<3.13"
 fastapi = "^0.110.0"
 uvicorn = {extras = ["standard"], version = "^0.28.0"}
 pydantic = "^2.6.4"
