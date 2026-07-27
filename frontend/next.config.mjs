@@ -1,5 +1,4 @@
-import type { NextConfig } from "next";
-
+/** @type {import('next').NextConfig} */
 const securityHeaders = [
   {
     key: "X-DNS-Prefetch-Control",
@@ -27,7 +26,7 @@ const securityHeaders = [
   },
 ];
 
-const nextConfig: NextConfig = {
+const nextConfig = {
   output: "standalone",
   reactStrictMode: true,
   images: {
