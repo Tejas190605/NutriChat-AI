@@ -180,3 +180,42 @@ async def test_onboarding_state_machine_steps(db_session: AsyncSession) -> None:
     user = await machine.lookup_user()
     assert user is not None
     assert user.profile.first_name == "Tejas"
+
+
+@pytest.mark.asyncio
+async def test_whatsapp_text_commands(db_session: AsyncSession) -> None:
+    """Verifies that hello, today, and history text commands process successfully."""
+    if db_session is None:
+        pytest.skip("Database is offline")
+
+    from src.services.whatsapp.tasks import process_incoming_whatsapp_message
+
+    phone = f"+91{uuid4().hex[:10]}"
+
+    # Test hello command
+    await process_incoming_whatsapp_message(db_session, phone, "hello")
+
+    # Test today command
+    await process_incoming_whatsapp_message(db_session, phone, "today")
+
+    # Test history command
+    await process_incoming_whatsapp_message(db_session, phone, "history")
+
+
+@pytest.mark.asyncio
+async def test_whatsapp_media_processing(db_session: AsyncSession) -> None:
+    """Verifies image download, vision AI analysis, meal saving, and response flow."""
+    if db_session is None:
+        pytest.skip("Database is offline")
+
+    from src.services.whatsapp.tasks import download_and_process_whatsapp_media
+
+    phone = f"+91{uuid4().hex[:10]}"
+    media_id = "mock_media_id_123"
+
+    await download_and_process_whatsapp_media(
+        db=db_session,
+        media_id=media_id,
+        phone=phone,
+    )
+

@@ -46,6 +46,33 @@ async def log_meal(
 
 
 @router.get(
+    "/",
+    response_model=list[MealResponse],
+    status_code=status.HTTP_200_OK,
+    summary="Get user logged meals list",
+)
+async def get_user_meals(
+    date_str: str | None = Query(default=None, alias="date", description="Target date in YYYY-MM-DD format"),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_async_session),
+) -> Any:
+    """Retrieves user's logged meals for a specific date or recent period."""
+    meal_service = MealService(db)
+    if date_str:
+        try:
+            target_date = date.fromisoformat(date_str)
+        except ValueError:
+            target_date = date.today()
+    else:
+        target_date = date.today()
+
+    start_dt = datetime.combine(target_date - timedelta(days=7), datetime.min.time(), tzinfo=UTC)
+    end_dt = datetime.combine(target_date, datetime.max.time(), tzinfo=UTC)
+
+    return await meal_service.get_meal_history(current_user.id, start_dt, end_dt)
+
+
+@router.get(
     "/history",
     response_model=list[MealResponse],
     status_code=status.HTTP_200_OK,

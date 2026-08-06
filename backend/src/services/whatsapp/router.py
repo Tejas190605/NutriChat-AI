@@ -89,19 +89,10 @@ class WhatsAppRouter:
                     # 4. Handle Media/Image intakes
                     if msg_type == "image":
                         image_id = msg.get("image", {}).get("id")
-
-                        # Register/retrieve user ID context to link to food image
-                        if user:
-                            user_id = user.id
-                        else:
-                            # Start onboarding welcome process and return alert
-                            await process_incoming_whatsapp_message(
-                                self.db, from_phone, "Hi"
-                            )
-                            continue
+                        user_id = user.id if user else None
 
                         if image_id:
-                            # Execute media download pipeline synchronously
+                            # Execute media download & food analysis pipeline
                             await download_and_process_whatsapp_media(
                                 db=self.db,
                                 media_id=image_id,
