@@ -10,14 +10,19 @@ from src.db.session import get_async_session
 from src.models.user import User
 from src.repositories.user import UserRepository
 
-security_scheme = HTTPBearer()
+security_scheme = HTTPBearer(auto_error=False)
 
 
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security_scheme),
+    credentials: HTTPAuthorizationCredentials | None = Depends(security_scheme),
     db: AsyncSession = Depends(get_async_session),
 ) -> User:
     """Dependency validating HTTP Bearer JWT tokens and returning current User."""
+    if not credentials:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated",
+        )
     token = credentials.credentials
     try:
         payload = jwt.decode(
