@@ -9,6 +9,7 @@ from fastapi.responses import HTMLResponse
 router = APIRouter()
 
 LAST_UPDATED = "August 7, 2026"
+SUPPORT_EMAIL = "tejasawant1962005@gmail.com"
 
 
 def _build_page_html(
@@ -140,6 +141,13 @@ def _build_page_html(
             margin-bottom: 0.75rem;
             margin-top: 1.5rem;
         }}
+        h3 {{
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--bg-dark);
+            margin-bottom: 0.5rem;
+            margin-top: 1rem;
+        }}
         p {{
             margin-bottom: 1rem;
             color: #334155;
@@ -157,6 +165,13 @@ def _build_page_html(
         strong {{
             color: var(--bg-dark);
         }}
+        a {{
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }}
+        a:hover {{
+            color: var(--primary);
+        }}
         .alert-box {{
             background-color: #f0fdf4;
             border-left: 4px solid var(--primary);
@@ -168,6 +183,19 @@ def _build_page_html(
             margin-bottom: 0;
             color: #166534;
             font-weight: 500;
+        }}
+        .info-box {{
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 1.25rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }}
+        .info-box p {{
+            margin-bottom: 0.5rem;
+        }}
+        .info-box p:last-child {{
+            margin-bottom: 0;
         }}
         footer {{
             background-color: var(--bg-dark);
@@ -245,7 +273,7 @@ def _build_page_html(
 @router.get("/privacy", response_class=HTMLResponse, summary="NutriChat AI Privacy Policy")
 async def get_privacy_policy() -> HTMLResponse:
     """Returns the public Privacy Policy webpage for NutriChat AI."""
-    content = """
+    content = f"""
     <section>
         <h2>1. Overview & Service Purpose</h2>
         <p>NutriChat AI ("we", "our", or "us") is an artificial intelligence-powered nutrition and wellness assistant. Our service enables users to log meals, estimate macronutrients, track daily dietary intake, and receive personalized nutrition insights by interacting via WhatsApp messages or our web dashboard.</p>
@@ -258,8 +286,8 @@ async def get_privacy_policy() -> HTMLResponse:
         <ul>
             <li><strong>Information You Provide Voluntarily:</strong> Profile inputs such as your name, age, gender, height, weight, daily activity level, and target wellness goals.</li>
             <li><strong>WhatsApp Messages & Media:</strong> Messages, food photos, meal descriptions, and barcodes sent to NutriChat AI via WhatsApp to perform food identification and nutrition analysis.</li>
-            <li><strong>Nutritional & Meal Logs:</strong> AI-estimated calories, protein, carbohydrates, fat, fiber, and meal consumption timestamps saved to your personal history diary.</li>
-            <li><strong>Technical & Session Data:</strong> Technical identifiers required to operate the service, including your WhatsApp phone number, session state tokens, and diagnostic logging entries.</li>
+            <li><strong>Nutritional & Meal Logs:</strong> AI-estimated calories, protein, carbohydrates, fat, fiber, and meal consumption timestamps saved to your personal history diary in our PostgreSQL database.</li>
+            <li><strong>Technical & Session Data:</strong> Technical identifiers required to operate the service, including your WhatsApp phone number, Redis session state tokens, and diagnostic logging entries.</li>
         </ul>
     </section>
 
@@ -288,13 +316,13 @@ async def get_privacy_policy() -> HTMLResponse:
     <section>
         <h2>5. Security Practices & Data Retention</h2>
         <p>We implement reasonable administrative, technical, and physical safeguards designed to protect user data against unauthorized access, loss, or misuse.</p>
-        <p>Meal logs and user profile details are retained to provide ongoing tracking history for as long as your account remains active or until you submit a data deletion request.</p>
+        <p>Meal logs and user profile details are retained in our database to provide ongoing tracking history for as long as your account remains active or until you submit a data deletion request.</p>
     </section>
 
     <section>
         <h2>6. User Rights & Data Deletion Requests</h2>
         <p>You have the right to access, review, or request deletion of your personal data stored by NutriChat AI at any time.</p>
-        <p>To request data deletion, you can send the <code>/reset</code> command in your WhatsApp chat or follow the instructions on our <a href="/data-deletion">Data Deletion Page</a>.</p>
+        <p>To request data deletion, follow the instructions on our <a href="/data-deletion">Data Deletion Page</a> or email us directly at <a href="mailto:{SUPPORT_EMAIL}">{SUPPORT_EMAIL}</a>.</p>
     </section>
 
     <div class="alert-box">
@@ -304,7 +332,7 @@ async def get_privacy_policy() -> HTMLResponse:
     <section>
         <h2>7. Policy Changes & Contact Information</h2>
         <p>We may update this Privacy Policy periodically. Any modifications become effective upon posting to this URL.</p>
-        <p>If you have any questions or privacy inquiries, please contact us at <strong>support@nutrichat.ai</strong>.</p>
+        <p>For privacy inquiries or questions about your personal data, contact us at <a href="mailto:{SUPPORT_EMAIL}">{SUPPORT_EMAIL}</a>.</p>
     </section>
     """
     html = _build_page_html("Privacy Policy", "/privacy", content)
@@ -314,7 +342,7 @@ async def get_privacy_policy() -> HTMLResponse:
 @router.get("/terms", response_class=HTMLResponse, summary="NutriChat AI Terms of Service")
 async def get_terms_of_service() -> HTMLResponse:
     """Returns the public Terms of Service webpage for NutriChat AI."""
-    content = """
+    content = f"""
     <section>
         <h2>1. Acceptance of Terms</h2>
         <p>By accessing or using NutriChat AI via WhatsApp or our web interface, you agree to be bound by these Terms of Service. If you do not agree with any part of these terms, you should not use the service.</p>
@@ -359,8 +387,9 @@ async def get_terms_of_service() -> HTMLResponse:
     </section>
 
     <section>
-        <h2>8. Changes to Terms & Contact</h2>
-        <p>We reserve the right to revise these Terms of Service at any time. Continued use of NutriChat AI following updates constitutes acceptance. For inquiries regarding these terms, contact <strong>support@nutrichat.ai</strong>.</p>
+        <h2>8. Changes to Terms & Contact Information</h2>
+        <p>We reserve the right to revise these Terms of Service at any time. Continued use of NutriChat AI following updates constitutes acceptance.</p>
+        <p>For inquiries regarding these Terms, contact <a href="mailto:{SUPPORT_EMAIL}">{SUPPORT_EMAIL}</a>.</p>
     </section>
     """
     html = _build_page_html("Terms of Service", "/terms", content)
@@ -370,51 +399,51 @@ async def get_terms_of_service() -> HTMLResponse:
 @router.get("/data-deletion", response_class=HTMLResponse, summary="NutriChat AI User Data Deletion Instructions")
 async def get_data_deletion_instructions() -> HTMLResponse:
     """Returns the public User Data Deletion Instructions webpage for NutriChat AI."""
-    content = """
+    content = f"""
     <section>
         <h2>Meta Developer App Data Deletion Compliance</h2>
-        <p>NutriChat AI provides straightforward and accessible data deletion procedures for users wishing to delete their account profile, WhatsApp chat sessions, or logged meal history records.</p>
+        <p>NutriChat AI provides straightforward procedures for users wishing to reset their session state or request complete deletion of their account profile and meal history records.</p>
     </section>
 
     <section>
-        <h2>How to Request Data Deletion</h2>
-        <p>You can request complete deletion of your user data through either of the following methods:</p>
-
-        <h3>Option 1: Direct WhatsApp Command (Instant Reset)</h3>
-        <p>Open your NutriChat AI chat on WhatsApp and send the following text command:</p>
+        <h2>Resetting Your WhatsApp Session</h2>
+        <p>Users may send the text command <code>/reset</code> in their NutriChat AI WhatsApp conversation to clear their active onboarding and conversational session state stored in our Redis cache.</p>
         <div class="alert-box">
-            <p><code>/reset</code></p>
+            <p><strong>Note:</strong> Sending <code>/reset</code> resets your active NutriChat AI chat session. It does not constitute a complete account or personal-data deletion request.</p>
         </div>
-        <p>Sending <code>/reset</code> clears your active onboarding state and session data stored in our Redis cache system.</p>
+    </section>
 
-        <h3>Option 2: Email Data Deletion Request</h3>
-        <p>Send an email request to our support team at:</p>
-        <p><strong>Email:</strong> <code>support@nutrichat.ai</code><br>
-        <strong>Subject Line:</strong> Data Deletion Request</p>
+    <section>
+        <h2>Request Complete Data Deletion</h2>
+        <p>For complete deletion of stored NutriChat AI personal data (including user profile records, goal settings, weight history, and logged meal entries in our persistent database), please submit an email request to:</p>
+        <div class="info-box">
+            <p><strong>Email:</strong> <a href="mailto:{SUPPORT_EMAIL}">{SUPPORT_EMAIL}</a></p>
+            <p><strong>Subject Line:</strong> Data Deletion Request</p>
+        </div>
     </section>
 
     <section>
         <h2>Information Required in Request</h2>
-        <p>When requesting data deletion via email, please include:</p>
+        <p>When submitting a data deletion request via email, please provide only the minimum information necessary to identify your account:</p>
         <ul>
-            <li>Your registered <strong>WhatsApp Phone Number</strong> (including country code, e.g. <code>+919876543210</code>).</li>
-            <li>Or your registered <strong>Account Email Address</strong> if created via the web dashboard.</li>
+            <li>Your registered <strong>WhatsApp Phone Number</strong> (including country code, e.g., <code>+919876543210</code>), OR</li>
+            <li>Your registered <strong>Account Email Address</strong> (if created via the web dashboard).</li>
         </ul>
     </section>
 
     <section>
-        <h2>Data Handling & Processing Workflow</h2>
-        <p>Upon receiving a verified deletion request:</p>
+        <h2>Data Deletion Handling & Process</h2>
+        <p>Upon receiving and verifying your request:</p>
         <ul>
-            <li>Your user record, profile metrics, goal settings, weight history, and logged meal entries will be permanently removed from our PostgreSQL database.</li>
-            <li>Active session tokens and cached parameters will be deleted from our Redis cache.</li>
-            <li>Email deletion requests are processed within <strong>7 business days</strong>, and confirmation will be sent to your email.</li>
+            <li>Your user account record, profile metrics, target goal settings, weight history, and logged meal entries will be manually processed and permanently removed from our persistent PostgreSQL database.</li>
+            <li>Active session tokens and cached state parameters will be cleared from our Redis cache.</li>
+            <li>Deletion requests are processed within <strong>7 business days</strong>, and confirmation will be sent to your email.</li>
         </ul>
     </section>
 
     <section>
         <h2>Data Retention Exceptions</h2>
-        <p>Certain non-identifying, aggregated system logs or transaction records may be retained temporarily where required for security audit compliance or mandatory legal obligations.</p>
+        <p>Certain non-identifying, aggregated system audit logs or security records may be retained temporarily where strictly required for security audit compliance or mandatory legal obligations.</p>
     </section>
     """
     html = _build_page_html("User Data Deletion Instructions", "/data-deletion", content)
