@@ -1,13 +1,9 @@
-import asyncio
 import os
 import time
 from collections.abc import Awaitable, Callable
-from contextlib import asynccontextmanager
 from typing import Any
 
 import structlog
-from alembic import command
-from alembic.config import Config
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -31,25 +27,6 @@ configure_logging()
 logger = structlog.get_logger()
 
 
-def run_db_migrations() -> None:
-    """Applies pending database migrations cleanly on application startup."""
-    try:
-        logger.info("Executing database migrations on startup...")
-        alembic_cfg = Config("alembic.ini")
-        command.upgrade(alembic_cfg, "head")
-        logger.info("Database migrations executed successfully.")
-    except Exception as e:
-        logger.error("Database migration execution failed on startup", error=str(e))
-        raise e
-
-
-@asynccontextmanager
-async def lifespan(_app: FastAPI):
-    """FastAPI application lifecycle managing startup database migrations."""
-    await asyncio.to_thread(run_db_migrations)
-    yield
-
-
 # Initialize FastAPI App
 app = FastAPI(
     title=settings.APP_NAME,
@@ -57,7 +34,6 @@ app = FastAPI(
     version="0.1.0",
     docs_url="/docs" if settings.ENV != "production" else None,
     redoc_url="/redoc" if settings.ENV != "production" else None,
-    lifespan=lifespan,
 )
 
 # Configure CORS middleware rules

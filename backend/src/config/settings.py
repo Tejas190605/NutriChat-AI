@@ -1,4 +1,7 @@
-from pydantic import Field, model_validator
+import json
+from typing import Any
+
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -16,6 +19,27 @@ class Settings(BaseSettings):
     CORS_ORIGINS: list[str] = Field(
         default=["http://localhost:3000", "http://127.0.0.1:3000"]
     )
+
+    @field_validator("CORS_ORIGINS", mode="before")
+    @classmethod
+    def parse_cors_origins(cls, v: Any) -> list[str]:
+        """Parses CORS_ORIGINS safely from JSON arrays, single raw URL strings, or comma-separated strings."""
+        if isinstance(v, list):
+            return [str(item).strip() for item in v if str(item).strip()]
+        if isinstance(v, str):
+            v_trimmed = v.strip()
+            if not v_trimmed:
+                return ["http://localhost:3000", "http://127.0.0.1:3000"]
+            if v_trimmed.startswith("[") and v_trimmed.endswith("]"):
+                try:
+                    parsed = json.loads(v_trimmed)
+                    if isinstance(parsed, list):
+                        return [str(item).strip() for item in parsed if str(item).strip()]
+                except json.JSONDecodeError:
+                    pass
+            origins = [item.strip() for item in v_trimmed.split(",") if item.strip()]
+            return origins if origins else ["http://localhost:3000", "http://127.0.0.1:3000"]
+        return v
 
     # Database
     POSTGRES_USER: str = Field(default="postgres")
