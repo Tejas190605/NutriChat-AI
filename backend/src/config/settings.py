@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     ENV: str = Field(default="development")
     DEBUG: bool = Field(default=True)
     PORT: int = Field(default=8000)
-    CORS_ORIGINS: list[str] = Field(
+    CORS_ORIGINS: list[str] | str = Field(
         default=["http://localhost:3000", "http://127.0.0.1:3000"]
     )
 
