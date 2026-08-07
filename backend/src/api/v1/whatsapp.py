@@ -117,7 +117,10 @@ async def receive_webhook(
     await redis_client.ltrim("whatsapp_webhook_logs", 0, 99)  # Keep latest 100 entries
 
     whatsapp_router = WhatsAppRouter(db)
-    await whatsapp_router.route_payload(body)
+    try:
+        await whatsapp_router.route_payload(body)
+    except Exception as e:
+        logger.error("Error processing WhatsApp webhook payload event", error=str(e))
 
     return {"status": "success"}
 

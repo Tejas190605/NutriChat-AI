@@ -6,7 +6,8 @@ from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-# Import settings and metadata target base
+# Import settings, all models, and metadata target base
+import src.models  # noqa: F401
 from src.config.settings import settings
 from src.db.base import Base
 
