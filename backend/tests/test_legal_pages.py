@@ -1,0 +1,44 @@
+"""Automated tests for public legal pages required by Meta WhatsApp Cloud API publishing."""
+
+import pytest
+from httpx import AsyncClient
+
+
+@pytest.mark.asyncio
+async def test_privacy_policy_page(client: AsyncClient) -> None:
+    """Verifies GET /privacy returns HTTP 200 HTML page with expected Privacy Policy content."""
+    response = await client.get("/privacy")
+
+    assert response.status_code == 200
+    assert "text/html" in response.headers["content-type"].lower()
+    assert "Privacy Policy" in response.text
+    assert "NutriChat AI" in response.text
+    assert "/terms" in response.text
+    assert "/data-deletion" in response.text
+
+
+@pytest.mark.asyncio
+async def test_terms_of_service_page(client: AsyncClient) -> None:
+    """Verifies GET /terms returns HTTP 200 HTML page with expected Terms of Service content."""
+    response = await client.get("/terms")
+
+    assert response.status_code == 200
+    assert "text/html" in response.headers["content-type"].lower()
+    assert "Terms of Service" in response.text
+    assert "Informational" in response.text or "Medical" in response.text
+    assert "/privacy" in response.text
+    assert "/data-deletion" in response.text
+
+
+@pytest.mark.asyncio
+async def test_data_deletion_page(client: AsyncClient) -> None:
+    """Verifies GET /data-deletion returns HTTP 200 HTML page with data deletion instructions."""
+    response = await client.get("/data-deletion")
+
+    assert response.status_code == 200
+    assert "text/html" in response.headers["content-type"].lower()
+    assert "Data Deletion" in response.text
+    assert "support@nutrichat.ai" in response.text
+    assert "/reset" in response.text
+    assert "/privacy" in response.text
+    assert "/terms" in response.text

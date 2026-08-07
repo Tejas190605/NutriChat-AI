@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from src.api.health import router as health_router
+from src.api.legal import router as legal_router
 from src.api.v1.ai import router as ai_router
 from src.api.v1.analytics import router as analytics_router
 from src.api.v1.auth import router as auth_router
@@ -71,6 +72,7 @@ async def log_requests_middleware(
 
 
 # Mount API Routers
+app.include_router(legal_router, tags=["Legal Compliance"])
 app.include_router(health_router, prefix="/api/v1", tags=["Diagnostic"])
 app.include_router(auth_router, prefix="/api/v1/auth", tags=["Authentication"])
 app.include_router(users_router, prefix="/api/v1/users", tags=["Users"])
