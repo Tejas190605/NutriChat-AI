@@ -219,3 +219,72 @@ async def test_whatsapp_media_processing(db_session: AsyncSession) -> None:
         phone=phone,
     )
 
+
+@pytest.mark.asyncio
+async def test_whatsapp_client_token_cleaning_and_diagnostics(monkeypatch) -> None:
+    """Verifies that WhatsAppClient strips quotes, whitespace, and 'Bearer ' prefix while logging safe diagnostics."""
+    monkeypatch.setattr(
+        settings, "WHATSAPP_ACCESS_TOKEN", '  "Bearer EAAG1234567890TestToken"  '
+    )
+    monkeypatch.setattr(settings, "WHATSAPP_PHONE_NUMBER_ID", "  1194867223712296  ")
+
+    client = WhatsAppClient()
+
+    assert client.access_token == "EAAG1234567890TestToken"
+    assert client.phone_number_id == "1194867223712296"
+    assert client.headers["Authorization"] == "Bearer EAAG1234567890TestToken"
+    assert client.is_mock is False
+
+    diag = client.get_diagnostics()
+    assert diag["token_present"] is True
+    assert diag["token_length"] == len("EAAG1234567890TestToken")
+    assert diag["unexpected_token_prefix"] is False
+    assert diag["phone_number_id_present"] is True
+    assert diag["graph_api_version"] == "v20.0"
+    assert diag["phone_number_id"] == "1194867223712296"
+
+
+@pytest.mark.asyncio
+async def test_whatsapp_client_graph_api_401_error_handling(monkeypatch) -> None:
+    """Verifies that WhatsAppClient logs detailed Meta Graph API error details on 401 Unauthorized."""
+    import httpx
+
+    monkeypatch.setattr(settings, "WHATSAPP_ACCESS_TOKEN", "EAAG_invalid_token_test")
+    monkeypatch.setattr(settings, "WHATSAPP_PHONE_NUMBER_ID", "1194867223712296")
+
+    client = WhatsAppClient()
+
+    # Mock custom HTTP 401 response from Meta Graph API
+    class MockResponse:
+        status_code = 401
+        is_error = True
+        text = '{"error":{"message":"Invalid OAuth access token","type":"OAuthException","code":190,"error_subcode":463,"fbtrace_id":"A123_test_trace"}}'
+
+        def json(self):
+            return json.loads(self.text)
+
+        def raise_for_status(self):
+            request = httpx.Request(
+                "POST", "https://graph.facebook.com/v20.0/1194867223712296/messages"
+            )
+            response = httpx.Response(401, request=request, text=self.text)
+            raise httpx.HTTPStatusError("401 Unauthorized", request=request, response=response)
+
+    class MockAsyncClient:
+        async def __aenter__(self):
+            return self
+
+        async def __aexit__(self, exc_type, exc_val, exc_tb):
+            pass
+
+        async def post(self, url, json=None, headers=None, timeout=None):  # noqa: ARG002
+            return MockResponse()
+
+    monkeypatch.setattr(httpx, "AsyncClient", MockAsyncClient)
+
+    with pytest.raises(httpx.HTTPStatusError) as exc_info:
+        await client.send_text("16315551181", "Test message")
+
+    assert exc_info.value.response.status_code == 401
+
+
